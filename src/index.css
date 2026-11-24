@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-serif: "Fraunces", Georgia, Cambria, "Times New Roman", serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-border-hairline: var(--border-hairline);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+}
+
+:root {
+  color-scheme: light;
+  --canvas: #F6F7F4;
+  --surface: #EBEDE7;
+  --ink: #14181D;
+  --muted: #4A545E;
+  --border-hairline: #D4D9D2;
+  --accent: #7D223C;
+  --accent-ink: #F6F7F4;
+  --accent-soft: #EFE6E8;
+  --header-bg: rgba(246, 247, 244, 0.86);
+  --shadow-elevated: 0 20px 50px -24px rgba(20, 24, 29, 0.22);
+}
+
+.dark {
+  color-scheme: dark;
+  --canvas: #131619;
+  --surface: #1C2126;
+  --ink: #F2F3EE;
+  --muted: #A5AEB8;
+  --border-hairline: #2D343C;
+  --accent: #E6A0B2;
+  --accent-ink: #131619;
+  --accent-soft: #2A2025;
+  --header-bg: rgba(19, 22, 25, 0.86);
+  --shadow-elevated: 0 24px 60px -24px rgba(0, 0, 0, 0.65);
+}
+
+@layer base {
+  html {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    overflow-x: clip;
+    transition: background-color 220ms ease, color 220ms ease;
+  }
+
+  .dark body {
+    letter-spacing: 0.008em;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+.header-glass {
+  background-color: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.elevated-sheet {
+  box-shadow: var(--shadow-elevated);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

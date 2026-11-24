@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
+          if (desc && typeof desc.get === 'function' && !desc.set && desc.configurable) {
+            var origGet = desc.get;
+            Object.defineProperty(window, 'fetch', {
+              configurable: true,
+              enumerable: desc.enumerable,
+              get: function () {
+                return origGet.call(window);
+              },
+              set: function () {
+                // Ignore browser extension attempts to overwrite getter-only window.fetch.
+              },
+            });
+          }
+        } catch (_) {}
+
+        window.addEventListener(
+          'error',
+          function (event) {
+            var src = event.filename || '';
+            var stack = (event.error && event.error.stack) || '';
+            if (
+              src.indexOf('chrome-extension://') === 0 ||
+              stack.indexOf('chrome-extension://') !== -1
+            ) {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+          },
+          true
+        );
+      })();
+    </script>
+    <title>Monograf Ulang Tahun</title>
+    <meta
+      name="description"
+      content="Monograf kenangan ulang tahun bergaya editorial dengan ruang dedikasi, babak perjalanan, arsip foto, surat tersegel, ritual lilin, dan buku ucapan."
+    />
+    <meta property="og:title" content="Monograf Ulang Tahun" />
+    <meta
+      property="og:description"
+      content="Monograf kenangan ulang tahun bergaya editorial dengan ruang dedikasi, babak perjalanan, arsip foto, surat tersegel, ritual lilin, dan buku ucapan."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

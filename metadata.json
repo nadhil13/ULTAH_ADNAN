@@ -1,0 +1,6 @@
+{
+  "name": "Monograf Ulang Tahun",
+  "description": "Monograf kenangan ulang tahun bergaya editorial dengan ruang dedikasi, babak perjalanan, arsip foto, surat tersegel, ritual lilin, dan buku ucapan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
