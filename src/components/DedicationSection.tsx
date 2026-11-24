@@ -33,7 +33,9 @@ export function DedicationSection({
     }
 
     const allWordEls = section.querySelectorAll<HTMLElement>('[data-dedication-word]');
-    const closingWordEls = section.querySelectorAll<HTMLElement>('[data-dedication-closing]');
+    const closingWordEls = section.querySelectorAll<HTMLElement>(
+      '[data-dedication-closing]'
+    );
     const progressEl = progressRuleRef.current;
     const signatureEl = signatureRef.current;
 
@@ -44,7 +46,7 @@ export function DedicationSection({
     const mm = gsap.matchMedia();
 
     mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
-      gsap.set(allWordEls, { opacity: 0.12 });
+      gsap.set(allWordEls, { opacity: 0.16 });
       if (progressEl) {
         gsap.set(progressEl, { scaleX: 0 });
       }
@@ -56,8 +58,8 @@ export function DedicationSection({
         scrollTrigger: {
           trigger: section,
           start: 'top top',
-          end: '+=160%',
-          scrub: 0.6,
+          end: '+=155%',
+          scrub: 0.7,
           pin: true,
           anticipatePin: 1,
         },
@@ -86,7 +88,6 @@ export function DedicationSection({
         );
       }
 
-      // Transition only the closing phrase into the Burgundy Claret / Rose Silk accent.
       if (closingWordEls.length > 0) {
         tl.to(
           closingWordEls,
@@ -115,7 +116,7 @@ export function DedicationSection({
     });
 
     mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
-      gsap.set(allWordEls, { opacity: 0.16 });
+      gsap.set(allWordEls, { opacity: 0.22 });
       if (progressEl) {
         gsap.set(progressEl, { scaleX: 0 });
       }
@@ -125,7 +126,7 @@ export function DedicationSection({
           trigger: section,
           start: 'top 78%',
           end: 'bottom 45%',
-          scrub: 0.6,
+          scrub: 0.7,
         },
       });
 
@@ -178,52 +179,57 @@ export function DedicationSection({
       ref={sectionRef}
       id="dedikasi"
       aria-labelledby="dedikasi-heading"
-      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-28 md:flex md:min-h-[100dvh] md:flex-col md:justify-center md:py-20"
+      className="scroll-mt-20 relative py-20 sm:py-26 md:flex md:min-h-[100dvh] md:flex-col md:justify-center md:py-16"
     >
       <div className="mx-auto w-full max-w-4xl px-5 sm:px-8">
-        <h2
-          id="dedikasi-heading"
-          className="text-sm font-sans font-medium text-muted mb-8 sm:mb-10"
-        >
-          Dedikasi
-        </h2>
+        <div className="paper-panel rounded-[12px] border px-6 py-9 sm:px-12 sm:py-12">
+          <h2
+            id="dedikasi-heading"
+            className="text-sm font-sans font-medium text-muted mb-6 sm:mb-8"
+          >
+            Dedikasi
+          </h2>
 
-        <p
-          aria-label={fullAccessibleText}
-          className="font-serif font-normal text-ink leading-[1.36] tracking-[-0.015em] text-[clamp(1.5rem,3vw,2.5rem)] max-w-[38ch]"
-        >
-          {mainWords.map((word, index) => (
-            <span
-              key={`main-${index}`}
-              aria-hidden="true"
-              data-dedication-word
-              className="inline-block mr-[0.26em]"
-            >
-              {word}
-            </span>
-          ))}
-          {closingWords.map((word, index) => (
-            <span
-              key={`closing-${index}`}
-              aria-hidden="true"
-              data-dedication-word
-              data-dedication-closing
-              className="inline-block mr-[0.26em] last:mr-0"
-            >
-              {word}
-            </span>
-          ))}
-        </p>
+          <p
+            aria-label={fullAccessibleText}
+            className="font-serif font-normal text-ink leading-[1.38] tracking-[-0.015em] text-[clamp(1.4rem,2.75vw,2.35rem)] max-w-[40ch]"
+          >
+            {mainWords.map((word, index) => (
+              <span
+                key={`main-${index}`}
+                aria-hidden="true"
+                data-dedication-word
+                className="inline-block mr-[0.26em]"
+              >
+                {word}
+              </span>
+            ))}
+            {closingWords.map((word, index) => (
+              <span
+                key={`closing-${index}`}
+                aria-hidden="true"
+                data-dedication-word
+                data-dedication-closing
+                className="inline-block mr-[0.26em] last:mr-0"
+              >
+                {word}
+              </span>
+            ))}
+          </p>
 
-        <p ref={signatureRef} className="mt-10 text-sm text-muted">
-          Disusun khusus oleh {senderName}
-        </p>
+          <p ref={signatureRef} className="mt-8 text-sm text-muted">
+            Disusun khusus oleh {senderName}
+          </p>
 
-        <div className="mt-12 h-px w-full bg-border-hairline overflow-hidden" aria-hidden="true">
           <div
-            ref={progressRuleRef}
-            className="h-full w-full origin-left bg-accent will-change-transform"
-          />
+            className="mt-9 h-px w-full bg-border-hairline overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              ref={progressRuleRef}
+              className="h-full w-full origin-left bg-accent will-change-transform"
+            />
+          </div>
         </div>
       </div>
     </section>

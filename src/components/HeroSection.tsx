@@ -2,11 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
-import { ArrowDown } from 'lucide-react';
-import {
-  DEFAULT_PORTRAIT_IMAGE,
-  type BirthdayConfig,
-} from '../data/birthdayConfig';
+import type { BirthdayConfig } from '../data/birthdayConfig';
 import { useSmoothScroll } from '../hooks/useSmoothScroll';
 import {
   calculateBirthdayStats,
@@ -67,7 +63,7 @@ export function HeroSection({
       });
 
       gsap.set(revealLayer, {
-        clipPath: 'inset(14% 16% 14% 16% round 12px)',
+        clipPath: 'inset(12% 10% 12% 10% round 12px)',
         opacity: 0,
       });
 
@@ -89,7 +85,7 @@ export function HeroSection({
         cover,
         {
           clipPath: 'inset(0% 0% 100% 0%)',
-          opacity: 0.12,
+          opacity: 0.1,
           scale: 0.96,
           ease: 'power2.inOut',
           duration: 0.58,
@@ -112,10 +108,9 @@ export function HeroSection({
       gsap.set(cover, { clearProps: 'all' });
       gsap.fromTo(
         revealLayer,
-        { opacity: 0, clipPath: 'inset(10% 0% 0% 0%)', y: 20 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
-          clipPath: 'inset(0% 0% 0% 0%)',
           y: 0,
           duration: 0.85,
           ease: 'power3.out',
@@ -146,12 +141,14 @@ export function HeroSection({
     ? `${config.birthplace}, ${stats.formattedBirthdate}`
     : stats.formattedBirthdate;
   const greetingText = `Selamat ulang tahun yang ke ${displayAge}, ${config.celebrantName}.`;
-  const isDefaultPortrait = config.portraitUrl === DEFAULT_PORTRAIT_IMAGE;
 
+  // Synchronous user-gesture trigger: starts Ari Lasso - Cinta Terakhir AND scrolls cleanly.
   const handleOpenCover = () => {
     onStartAudio?.();
     const isDesktop = window.innerWidth >= 768;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
     if (isDesktop && !prefersReduced) {
       scrollTo(Math.round(window.innerHeight * 1.28), 0);
       return;
@@ -169,33 +166,33 @@ export function HeroSection({
       aria-label="Sampul dan Pembuka Monograf"
       className="relative w-full md:h-[100dvh] md:overflow-hidden"
     >
-      {/* Layer 2 (Top at scrollY = 0): Transparent Opening Cover framing the Living Rumah Gadang World */}
+      {/* Layer 2 (Top at scrollY = 0): Opening Cover positioned cleanly above the Rumah Gadang roofline */}
       <div
         ref={coverRef}
         data-testid="opening-cover-curtain"
-        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 pt-20 pb-12 text-center md:absolute md:inset-0 md:z-20 ${
+        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 pt-22 pb-34 sm:px-8 sm:pb-40 text-center md:absolute md:inset-0 md:z-20 ${
           isUnveiled ? 'md:pointer-events-none' : 'md:pointer-events-auto'
         }`}
       >
-        {/* Subtle radial sky-clarity wash behind typography so WCAG AA+ contrast holds over scenic layers */}
+        {/* Soft upper-sky clarity scrim guaranteeing >7:1 WCAG AA+ text contrast across the cover */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--canvas) 78%, transparent) 0%, color-mix(in srgb, var(--canvas) 36%, transparent) 44%, transparent 72%)',
+              'radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--canvas) 90%, transparent) 0%, color-mix(in srgb, var(--canvas) 62%, transparent) 42%, transparent 74%)',
           }}
         />
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center">
           <div
             aria-hidden="true"
-            className="mb-6 flex h-15 w-15 items-center justify-center rounded-full border border-border-hairline bg-canvas/85 font-serif text-base font-medium tracking-wider text-accent backdrop-blur-[2px]"
+            className="paper-panel mb-5 flex h-14 w-14 items-center justify-center rounded-full border font-serif text-base font-medium tracking-wider text-accent"
           >
             {monogram}
           </div>
 
-          <p className="text-xs sm:text-sm font-medium tracking-[0.04em] text-muted mb-3">
+          <p className="text-xs sm:text-sm font-medium tracking-[0.03em] text-muted mb-2.5">
             {config.coverHeaderLine}
           </p>
 
@@ -203,32 +200,28 @@ export function HeroSection({
             as="h1"
             text={config.celebrantName}
             immediate
-            className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.06] text-[clamp(2.55rem,5.6vw,4.85rem)]"
+            className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.06] text-[clamp(2.45rem,5.5vw,4.75rem)]"
           />
 
-          <p className="mt-4 text-sm sm:text-base font-medium text-accent">
+          <p className="mt-3.5 text-sm sm:text-base font-medium text-accent">
             {birthStamp}
           </p>
 
-          <p className="mt-2.5 max-w-[44ch] text-sm sm:text-base leading-relaxed text-muted">
-            {config.coverSubtitle}
-          </p>
-
-          <div className="mt-10 flex flex-col items-center gap-4">
+          <div className="mt-8 sm:mt-9 flex flex-col items-center gap-3.5">
             <motion.button
               type="button"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.985 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               onClick={handleOpenCover}
-              className="inline-flex min-h-12 items-center gap-2.5 rounded-[8px] bg-accent px-7 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap cursor-pointer"
+              className="inline-flex min-h-12 items-center justify-center rounded-[8px] bg-accent px-8 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap cursor-pointer"
             >
-              <span>Buka Lembaran</span>
-              <ArrowDown className="h-4 w-4" aria-hidden="true" />
+              Buka Lembaran
             </motion.button>
 
-            <span className="text-xs text-muted">
-              atau gulir perlahan untuk menyibak cerita
+            {/* Soft-scrim caption pill seated well above the Rumah Gadang gonjong spires */}
+            <span className="cover-caption-pill inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-medium text-muted">
+              Gulir perlahan untuk menyibak cerita
             </span>
           </div>
         </div>
@@ -239,27 +232,27 @@ export function HeroSection({
         ref={revealLayerRef}
         id="pembuka-monograf"
         data-testid="hero-unveiled-spread"
-        className={`editorial-scrim relative w-full md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${
+        className={`relative w-full md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${
           isUnveiled ? 'md:pointer-events-auto' : 'md:pointer-events-none'
         }`}
       >
         <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 md:py-10">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
-            <div className="min-w-0 lg:col-span-7 flex flex-col justify-center">
-              <p className="text-sm text-muted mb-4">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-12">
+            <div className="paper-panel min-w-0 lg:col-span-7 flex flex-col justify-center rounded-[12px] border p-6 sm:p-9">
+              <p className="text-sm text-muted mb-3">
                 Monograf ulang tahun, {birthStamp}
               </p>
 
-              <h2 className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.08] text-[clamp(2.15rem,4.2vw,3.8rem)]">
+              <h2 className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.08] text-[clamp(2rem,3.9vw,3.45rem)]">
                 {greetingText}
               </h2>
 
-              <p className="mt-5 max-w-[58ch] text-base sm:text-lg leading-relaxed text-muted">
+              <p className="mt-4 max-w-[56ch] text-base leading-relaxed text-muted">
                 {config.heroOpeningLine}
               </p>
 
-              <div className="mt-8 border-t border-b border-border-hairline py-5">
-                <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
+              <div className="mt-7 border-t border-b border-border-hairline py-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3.5">
                   <p className="text-sm font-medium text-ink">
                     Waktu yang telah dijalani
                   </p>
@@ -268,49 +261,48 @@ export function HeroSection({
                       ? stats.isBirthdayToday
                         ? 'Hari ini adalah hari ulang tahunmu'
                         : `Menuju usia ${stats.upcomingAge}: ${stats.daysUntilNextBirthday} hari, ${stats.hoursUntilNextBirthday} jam, ${stats.minutesUntilNextBirthday} menit lagi`
-                      : 'Atur tanggal lahir di Ubah Data'}
+                      : 'Tanggal lahir belum diatur'}
                   </p>
                 </div>
 
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+                <dl className="grid grid-cols-2 gap-x-6 gap-y-3.5 sm:grid-cols-4">
                   <div className="min-w-0">
                     <dt className="text-xs text-muted">Tahun</dt>
-                    <dd className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
+                    <dd className="mt-0.5 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
                       {stats.isValid ? stats.yearsLived : '0'}
                     </dd>
                   </div>
                   <div className="min-w-0">
                     <dt className="text-xs text-muted">Hari berjalan</dt>
-                    <dd className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
+                    <dd className="mt-0.5 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
                       {stats.isValid ? stats.daysSinceLastBirthday : '0'}
                     </dd>
                   </div>
                   <div className="min-w-0">
                     <dt className="text-xs text-muted">Jam</dt>
-                    <dd className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
+                    <dd className="mt-0.5 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
                       {stats.isValid ? stats.hoursRemainder : '0'}
                     </dd>
                   </div>
                   <div className="min-w-0">
                     <dt className="text-xs text-muted">Menit</dt>
-                    <dd className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
+                    <dd className="mt-0.5 font-serif text-2xl sm:text-3xl font-medium text-ink tabular-nums">
                       {stats.isValid ? stats.minutesRemainder : '0'}
                     </dd>
                   </div>
                 </dl>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-7 flex flex-wrap items-center gap-4">
                 <motion.button
                   type="button"
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.985 }}
                   transition={{ type: 'spring', stiffness: 320, damping: 24 }}
                   onClick={() => scrollTo('#dedikasi', 0)}
-                  className="inline-flex min-h-12 items-center gap-2.5 rounded-[8px] bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap shrink-0 cursor-pointer"
+                  className="inline-flex min-h-12 items-center justify-center rounded-[8px] bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  <span>Baca Lembaran Pertama</span>
-                  <ArrowDown className="h-4 w-4" aria-hidden="true" />
+                  Baca Lembaran Pertama
                 </motion.button>
               </div>
             </div>
@@ -319,21 +311,10 @@ export function HeroSection({
               <EditorialPhotoFrame
                 src={config.portraitUrl}
                 alt={`Potret edisi ulang tahun untuk ${config.celebrantName}`}
-                subLabel={isDefaultPortrait ? 'Potret edisi 22 tahun' : config.portraitCaption}
+                subLabel={config.portraitCaption}
                 aspectClass="aspect-[3/4]"
-                maxHeightClass="max-h-[58dvh]"
+                maxHeightClass="max-h-[56dvh]"
                 parallaxAxis="none"
-                isDefaultSlot={isDefaultPortrait}
-                defaultHint="Ganti dengan foto asli Dinda"
-                footerRight={
-                  <button
-                    type="button"
-                    onClick={onOpenPersonalize}
-                    className="text-accent underline underline-offset-4 hover:opacity-80 whitespace-nowrap shrink-0 cursor-pointer py-1"
-                  >
-                    Ganti foto di Ubah Data
-                  </button>
-                }
               />
             </div>
           </div>
@@ -342,4 +323,3 @@ export function HeroSection({
     </section>
   );
 }
-

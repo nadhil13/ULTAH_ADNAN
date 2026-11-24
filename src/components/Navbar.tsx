@@ -1,18 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Moon, Pause, Play, SlidersHorizontal, Sun, Volume2, X } from 'lucide-react';
+import {
+  Loader2,
+  Moon,
+  Pause,
+  Play,
+  SlidersHorizontal,
+  Sun,
+  Volume2,
+  VolumeX,
+  X,
+} from 'lucide-react';
 import { useSmoothScroll } from '../hooks/useSmoothScroll';
+import type { SoundtrackContextValue } from '../hooks/useSoundtrack';
 import { extractMonogram } from '../utils/birthdayMath';
 
 interface NavbarProps {
   celebrantName: string;
   isDark: boolean;
   onToggleTheme: () => void;
-  isPlayingAudio: boolean;
-  audioVolume: number;
-  customTrackName: string | null;
-  onToggleAudio: () => void;
-  onChangeVolume: (volume: number) => void;
+  soundtrack: SoundtrackContextValue;
   onOpenPersonalize: () => void;
 }
 
@@ -25,15 +32,14 @@ const NAV_LINKS = [
   { href: '#ucapan', label: 'Ucapan' },
 ] as const;
 
+// Set to true whenever the user requests the Ubah Data button to be shown again.
+const SHOW_PERSONALIZE_BUTTON = false;
+
 export function Navbar({
   celebrantName,
   isDark,
   onToggleTheme,
-  isPlayingAudio,
-  audioVolume,
-  customTrackName,
-  onToggleAudio,
-  onChangeVolume,
+  soundtrack,
   onOpenPersonalize,
 }: NavbarProps) {
   const { scrollTo } = useSmoothScroll();
@@ -44,7 +50,9 @@ export function Navbar({
 
   const monogram = extractMonogram(celebrantName);
   const displayName =
-    celebrantName.length > 22 ? `${celebrantName.slice(0, 22).trim()}...` : celebrantName;
+    celebrantName.length > 22
+      ? `${celebrantName.slice(0, 22).trim()}...`
+      : celebrantName;
 
   useEffect(() => {
     const onScroll = () => {
@@ -82,11 +90,24 @@ export function Navbar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [volumePanelOpen]);
 
-  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
     event.preventDefault();
     setMobileMenuOpen(false);
     scrollTo(href, -76);
   };
+
+  const isLoading = soundtrack.playbackStatus === 'loading';
+  const isPlaying = soundtrack.isPlaying;
+  const pillActionLabel = isLoading
+    ? 'Memuat lagu...'
+    : isPlaying
+      ? 'Diputar'
+      : soundtrack.playbackStatus === 'paused'
+        ? 'Jeda'
+        : 'Cinta Terakhir';
 
   return (
     <header
@@ -96,17 +117,18 @@ export function Navbar({
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
         <a
           href="#beranda"
           onClick={(e) => handleNavClick(e, '#beranda')}
-          className="font-serif text-lg font-medium tracking-tight text-ink whitespace-nowrap shrink-0 hover:text-accent transition-colors"
+          className="inline-flex min-h-11 items-center font-serif text-lg font-medium tracking-tight text-ink whitespace-nowrap shrink-0 hover:text-accent transition-colors"
           aria-label={`Kembali ke beranda ${celebrantName}`}
         >
           <span className="hidden sm:inline">{displayName}</span>
           <span className="sm:hidden">{monogram}</span>
         </a>
 
+        {/* Clean hairline ghost links on desktop */}
         <nav
           aria-label="Navigasi utama"
           className="hidden lg:flex items-center gap-6 text-sm text-muted"
@@ -116,38 +138,53 @@ export function Navbar({
               key={item.href}
               href={item.href}
               onClick={(e) => handleNavClick(e, item.href)}
-              className="py-1 whitespace-nowrap shrink-0 hover:text-ink transition-colors border-b border-transparent hover:border-border-hairline"
+              className="inline-flex min-h-11 items-center whitespace-nowrap shrink-0 hover:text-ink transition-colors border-b border-transparent hover:border-accent/60"
             >
               {item.label}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Sleek airy desktop controls: ONE subtle pill for music, hairline ghost buttons for theme & personalize */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <div ref={volumePopoverRef} className="relative hidden sm:flex items-center">
-            <div className="inline-flex items-center rounded-full border border-border-hairline bg-surface">
+            <div className="paper-panel inline-flex items-center rounded-full border">
               <button
                 type="button"
-                onClick={onToggleAudio}
-                aria-label={isPlayingAudio ? 'Jeda musik latar' : 'Putar musik latar'}
-                aria-pressed={isPlayingAudio}
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-l-full px-3 text-xs font-medium text-ink hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                onClick={soundtrack.toggle}
+                aria-label={
+                  isPlaying || isLoading
+                    ? `Jeda lagu ${soundtrack.trackLabel}`
+                    : `Putar lagu ${soundtrack.trackLabel}`
+                }
+                aria-pressed={isPlaying}
+                className="inline-flex min-h-11 items-center gap-2 rounded-l-full pl-3.5 pr-3 text-xs font-medium text-ink hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
-                {isPlayingAudio ? (
-                  <Pause className="h-3.5 w-3.5" aria-hidden="true" />
+                {isLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" aria-hidden="true" />
+                ) : isPlaying ? (
+                  <Pause className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 ) : (
-                  <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                  <Play className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                 )}
-                <span>{isPlayingAudio ? 'Jeda' : 'Musik'}</span>
+                <span>{pillActionLabel}</span>
+                <span className="hidden xl:inline text-muted font-normal">
+                  · Ari Lasso
+                </span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setVolumePanelOpen((prev) => !prev)}
-                aria-label="Atur volume musik latar"
+                aria-label="Pengaturan volume dan sumber lagu"
                 aria-expanded={volumePanelOpen}
-                className="inline-flex min-h-10 min-w-9 items-center justify-center rounded-r-full border-l border-border-hairline text-muted hover:text-ink transition-colors cursor-pointer"
+                className="inline-flex min-h-11 min-w-10 items-center justify-center rounded-r-full border-l border-border-hairline px-2.5 text-muted hover:text-ink transition-colors cursor-pointer"
               >
-                <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+                {soundtrack.isMuted || soundtrack.volume === 0 ? (
+                  <VolumeX className="h-3.5 w-3.5" aria-hidden="true" />
+                ) : (
+                  <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+                )}
               </button>
             </div>
 
@@ -158,25 +195,69 @@ export function Navbar({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
                   transition={{ duration: 0.16 }}
-                  className="elevated-sheet absolute right-0 top-12 z-50 w-56 rounded-[12px] border border-border-hairline bg-canvas p-4"
+                  className="elevated-sheet absolute right-0 top-13 z-50 w-68 rounded-[12px] border border-border-hairline bg-canvas p-4"
                 >
-                  <div className="flex items-center justify-between text-xs text-muted mb-2">
-                    <span>Volume latar</span>
-                    <span className="tabular-nums text-ink">{Math.round(audioVolume * 100)}%</span>
+                  <div className="flex items-start justify-between gap-2 border-b border-border-hairline pb-2.5">
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-ink">
+                        {soundtrack.trackLabel}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-muted">
+                        Status: {soundtrack.statusLabel}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={soundtrack.toggleMute}
+                      aria-label={soundtrack.isMuted ? 'Nyalakan suara' : 'Bisukan suara'}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[8px] text-muted hover:bg-surface hover:text-ink transition-colors cursor-pointer shrink-0"
+                    >
+                      {soundtrack.isMuted || soundtrack.volume === 0 ? (
+                        <VolumeX className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <Volume2 className="h-4 w-4" aria-hidden="true" />
+                      )}
+                    </button>
                   </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    value={audioVolume}
-                    onChange={(e) => onChangeVolume(Number(e.target.value))}
-                    aria-label="Pengatur volume musik latar"
-                    className="w-full accent-accent cursor-pointer"
-                  />
-                  <p className="mt-2 truncate text-xs text-muted">
-                    {customTrackName ? `Lagu lokal: ${customTrackName}` : 'Instrumen ambient bawaan'}
-                  </p>
+
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-muted mb-1.5">
+                      <span>Volume latar</span>
+                      <span className="tabular-nums text-ink">
+                        {soundtrack.isMuted ? 0 : Math.round(soundtrack.volume * 100)}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={soundtrack.isMuted ? 0 : soundtrack.volume}
+                      onChange={(e) => soundtrack.setVolume(Number(e.target.value))}
+                      aria-label="Pengatur volume musik latar"
+                      className="w-full accent-accent cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="mt-3 border-t border-border-hairline pt-2.5 flex items-center justify-between gap-2">
+                    {soundtrack.sourceMode !== 'ambient' ? (
+                      <button
+                        type="button"
+                        onClick={soundtrack.switchToAmbient}
+                        className="text-xs font-medium text-accent hover:underline underline-offset-4 cursor-pointer py-1"
+                      >
+                        Gunakan melodi ambient bawaan
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={soundtrack.switchToYouTube}
+                        className="text-xs font-medium text-accent hover:underline underline-offset-4 cursor-pointer py-1"
+                      >
+                        Putar Cinta Terakhir (YouTube)
+                      </button>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -186,7 +267,7 @@ export function Navbar({
             type="button"
             onClick={onToggleTheme}
             aria-label={isDark ? 'Beralih ke tema terang' : 'Beralih ke tema gelap'}
-            className="inline-flex h-11 w-11 sm:h-10 sm:w-10 items-center justify-center rounded-[8px] border border-border-hairline bg-canvas text-ink hover:border-accent hover:text-accent transition-colors cursor-pointer shrink-0"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[8px] text-ink hover:bg-surface/80 hover:text-accent transition-colors cursor-pointer shrink-0"
           >
             {isDark ? (
               <Sun className="h-4 w-4" aria-hidden="true" />
@@ -195,21 +276,23 @@ export function Navbar({
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={onOpenPersonalize}
-            className="hidden sm:inline-flex min-h-10 items-center gap-1.5 rounded-[8px] border border-border-hairline bg-surface px-3.5 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Ubah Data</span>
-          </button>
+          {SHOW_PERSONALIZE_BUTTON && (
+            <button
+              type="button"
+              onClick={onOpenPersonalize}
+              className="hidden sm:inline-flex min-h-11 items-center gap-1.5 rounded-[8px] px-3 text-xs font-medium text-ink hover:bg-surface/80 hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Ubah Data</span>
+            </button>
+          )}
 
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation-drawer"
-            className="inline-flex lg:hidden min-h-11 min-w-11 items-center justify-center rounded-[8px] border border-border-hairline bg-surface px-3.5 text-sm font-medium text-ink hover:border-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="paper-panel inline-flex lg:hidden min-h-11 min-w-11 items-center justify-center rounded-[8px] border px-3.5 text-sm font-medium text-ink hover:border-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
           >
             {mobileMenuOpen ? 'Tutup' : 'Menu'}
           </button>
@@ -252,42 +335,76 @@ export function Navbar({
             </nav>
 
             <div className="mt-5 flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 rounded-[10px] border border-border-hairline bg-surface px-4 py-3">
-                <button
-                  type="button"
-                  onClick={onToggleAudio}
-                  className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-ink cursor-pointer"
-                >
-                  {isPlayingAudio ? (
-                    <Pause className="h-4 w-4 text-accent" aria-hidden="true" />
+              <div className="rounded-[10px] border border-border-hairline bg-surface px-4 py-3 space-y-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={soundtrack.toggle}
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-ink cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-accent" aria-hidden="true" />
+                    ) : isPlaying ? (
+                      <Pause className="h-4 w-4 text-accent" aria-hidden="true" />
+                    ) : (
+                      <Play className="h-4 w-4 text-accent" aria-hidden="true" />
+                    )}
+                    <span>
+                      {isLoading
+                        ? 'Memuat lagu...'
+                        : isPlaying
+                          ? 'Jeda Lagu'
+                          : 'Putar Lagu'}
+                    </span>
+                  </button>
+
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={soundtrack.isMuted ? 0 : soundtrack.volume}
+                    onChange={(e) => soundtrack.setVolume(Number(e.target.value))}
+                    aria-label="Volume musik latar"
+                    className="w-24 accent-accent cursor-pointer"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted border-t border-border-hairline pt-2">
+                  <span className="truncate">{soundtrack.trackLabel}</span>
+                  {soundtrack.sourceMode !== 'ambient' ? (
+                    <button
+                      type="button"
+                      onClick={soundtrack.switchToAmbient}
+                      className="text-accent font-medium underline underline-offset-4 cursor-pointer py-1"
+                    >
+                      Melodi ambient
+                    </button>
                   ) : (
-                    <Play className="h-4 w-4 text-accent" aria-hidden="true" />
+                    <button
+                      type="button"
+                      onClick={soundtrack.switchToYouTube}
+                      className="text-accent font-medium underline underline-offset-4 cursor-pointer py-1"
+                    >
+                      Lagu YouTube
+                    </button>
                   )}
-                  <span>{isPlayingAudio ? 'Jeda Musik Latar' : 'Putar Musik Latar'}</span>
-                </button>
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={audioVolume}
-                  onChange={(e) => onChangeVolume(Number(e.target.value))}
-                  aria-label="Volume musik latar"
-                  className="w-24 accent-accent cursor-pointer"
-                />
+                </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenPersonalize();
-                }}
-                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-accent px-4 py-2.5 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity cursor-pointer"
-              >
-                <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-                <span>Ubah Data Monograf</span>
-              </button>
+              {SHOW_PERSONALIZE_BUTTON && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenPersonalize();
+                  }}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-[8px] bg-accent px-4 py-2.5 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity cursor-pointer"
+                >
+                  <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                  <span>Ubah Data Monograf</span>
+                </button>
+              )}
             </div>
           </motion.div>
         )}

@@ -25,6 +25,11 @@ export default defineConfig(() => {
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
           }
+          const rootImgDir = path.resolve(__dirname, 'img');
+          const distImgDir = path.resolve(distDir, 'img');
+          if (fs.existsSync(distDir) && fs.existsSync(rootImgDir)) {
+            fs.cpSync(rootImgDir, distImgDir, {recursive: true, force: true});
+          }
         },
       },
     ],

@@ -26,8 +26,8 @@ function ChapterRow({ chapter, index }: { chapter: ChapterItem; index: number })
         whileHover={{ y: -4 }}
         whileTap={{ scale: 0.985 }}
         transition={CARD_SPRING}
-        className={`rounded-[12px] border border-border-hairline p-7 sm:p-10 transition-colors hover:border-accent/60 ${
-          isQuoteHighlight ? 'bg-surface' : 'bg-canvas'
+        className={`rounded-[12px] border p-7 sm:p-10 transition-colors hover:border-accent/60 ${
+          isQuoteHighlight ? 'paper-panel-tinted' : 'paper-panel'
         }`}
       >
         {isSplitCaption ? (
@@ -88,10 +88,9 @@ function ChapterRow({ chapter, index }: { chapter: ChapterItem; index: number })
         src={chapter.plateSrc}
         alt={chapter.plateAlt}
         subLabel={chapter.plateCaption}
-        aspectClass="aspect-[4/3]"
+        aspectClass="aspect-[4/5]"
         parallaxAxis="y"
         tiltDirection={isOdd ? -1 : 1}
-        isDefaultSlot={false}
       />
     </div>
   );
@@ -109,27 +108,33 @@ export function ChaptersSection() {
     <section
       id="babak"
       aria-labelledby="babak-heading"
-      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
+      className="scroll-mt-20 relative py-20 sm:py-28"
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end mb-14 sm:mb-20">
-          <div className="lg:col-span-7 min-w-0">
-            <p className="text-sm text-muted mb-3">Babak Perjalanan</p>
-            <WordReveal
-              id="babak-heading"
-              as="h2"
-              text="Empat jeda kecil dari Sungai Sirah menuju usia dua puluh dua."
-              className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.9rem,3.4vw,3rem)]"
-            />
+        <div className="paper-panel rounded-[12px] border p-6 sm:p-9 mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7 min-w-0">
+              <p className="text-sm text-muted mb-2.5">Babak Perjalanan</p>
+              <WordReveal
+                id="babak-heading"
+                as="h2"
+                text="Empat jeda kecil dari Sungai Sirah menuju usia dua puluh dua."
+                className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.85rem,3.3vw,2.9rem)]"
+              />
+            </div>
+            <ScrollRevealStage
+              variant="lift"
+              delay={0.08}
+              className="lg:col-span-4 lg:col-start-9"
+            >
+              <p className="text-sm leading-relaxed text-muted max-w-[44ch]">
+                Disusun berurutan sebagai penanda fase, dari halaman rumah yang hangat hingga ruang baru di usia 22 tahun.
+              </p>
+            </ScrollRevealStage>
           </div>
-          <ScrollRevealStage variant="lift" delay={0.08} className="lg:col-span-4 lg:col-start-9">
-            <p className="text-sm leading-relaxed text-muted max-w-[44ch]">
-              Disusun berurutan sebagai penanda fase, dari akar yang hangat hingga halaman bersih di usia 22 tahun.
-            </p>
-          </ScrollRevealStage>
         </div>
 
-        <div className="space-y-14 sm:space-y-20">
+        <div className="space-y-12 sm:space-y-18">
           {CHAPTERS_DATA.map((chapter, index) => (
             <ChapterRow key={chapter.id} chapter={chapter} index={index} />
           ))}
@@ -138,4 +143,3 @@ export function ChaptersSection() {
     </section>
   );
 }
-

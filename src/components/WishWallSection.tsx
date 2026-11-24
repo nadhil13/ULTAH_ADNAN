@@ -94,25 +94,25 @@ export function WishWallSection({
     <section
       id="ucapan"
       aria-labelledby="ucapan-heading"
-      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
+      className="scroll-mt-20 relative py-20 sm:py-28"
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="mb-14 max-w-2xl">
-          <p className="text-sm text-muted mb-3">Buku Ucapan</p>
+        <div className="paper-panel rounded-[12px] border p-6 sm:p-8 mb-10">
+          <p className="text-sm text-muted mb-2.5">Buku Ucapan</p>
           <WordReveal
             id="ucapan-heading"
             as="h2"
             text={`Tinggalkan pesan hangat untuk ${celebrantName}.`}
-            className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.9rem,3.4vw,3rem)]"
+            className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.85rem,3.3vw,2.85rem)]"
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
           <ScrollRevealStage variant="lift" className="min-w-0 lg:col-span-5">
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="rounded-[12px] border border-border-hairline bg-surface p-6 sm:p-8"
+              className="paper-panel-tinted rounded-[12px] border p-6 sm:p-8"
             >
               <h3 className="font-serif text-xl font-medium text-ink">
                 Tulis Ucapan Baru
@@ -170,7 +170,7 @@ export function WishWallSection({
                     type="text"
                     value={relation}
                     onChange={(e) => setRelation(e.target.value)}
-                    placeholder="Contoh: Sahabat, Keluarga, Rekan kerja"
+                    placeholder="Contoh: Sahabat, Keluarga, Rekan kuliah"
                     className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-canvas px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-accent"
                   />
                 </div>
@@ -229,7 +229,7 @@ export function WishWallSection({
           </ScrollRevealStage>
 
           <ScrollRevealStage variant="lift" delay={0.08} className="min-w-0 lg:col-span-7">
-            <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-border-hairline pb-3">
+            <div className="paper-panel mb-5 flex items-baseline justify-between gap-4 rounded-[10px] border px-5 py-3.5">
               <h3 className="font-serif text-xl font-medium text-ink">
                 Catatan yang Tersimpan
               </h3>
@@ -239,7 +239,7 @@ export function WishWallSection({
             </div>
 
             {wishes.length === 0 ? (
-              <div className="rounded-[12px] border border-border-hairline bg-canvas px-7 py-14 text-center">
+              <div className="paper-panel rounded-[12px] border px-7 py-14 text-center">
                 <MessageSquareText
                   className="mx-auto h-7 w-7 text-muted mb-4"
                   aria-hidden="true"
@@ -270,7 +270,7 @@ export function WishWallSection({
                       exit={{ opacity: 0, y: -10, scale: 0.98 }}
                       transition={CARD_SPRING}
                       whileHover={{ y: -3 }}
-                      className="rounded-[12px] border border-border-hairline bg-canvas p-6 transition-colors hover:border-accent/60"
+                      className="paper-panel rounded-[12px] border p-6 transition-colors hover:border-accent/60"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">

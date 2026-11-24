@@ -98,91 +98,93 @@ export function CandleSection({
     <section
       id="lilin"
       aria-labelledby="lilin-heading"
-      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
+      className="twilight-stage scroll-mt-20 relative py-22 sm:py-30 text-ink"
     >
-      <FoilParticlesCanvas triggerKey={foilTriggerKey} isDark={isDark} />
+      <FoilParticlesCanvas triggerKey={foilTriggerKey} isDark={true} />
 
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10">
           <ScrollRevealStage variant="lift" className="min-w-0 lg:col-span-6">
-            <p className="text-sm text-muted mb-3">Ritual Lilin</p>
-            <WordReveal
-              id="lilin-heading"
-              as="h2"
-              text="Simpan satu harapan kecil sebelum meniup lilinnya."
-              className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.9rem,3.4vw,3rem)]"
-            />
-
-            <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-muted">
-              Tuliskan harapan pribadi jika ingin (hanya tersimpan di layar ini dan tidak dikirim ke mana pun), lalu klik atau tahan tombol di bawah untuk memadamkan api.
-            </p>
-
-            <div className="mt-8 max-w-md">
-              <label
-                htmlFor="private-wish-input"
-                className="block text-sm font-medium text-ink mb-2"
-              >
-                Harapan pribadi (opsional)
-              </label>
-              <input
-                id="private-wish-input"
-                type="text"
-                value={wishText}
-                onChange={(e) => setWishText(e.target.value)}
-                placeholder="Contoh: selalu diberi ketenangan dan kesehatan"
-                maxLength={140}
-                className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-canvas px-4 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-accent"
+            <div className="paper-panel rounded-[12px] border p-7 sm:p-10">
+              <p className="text-sm text-muted mb-2.5">Ritual Lilin Senja</p>
+              <WordReveal
+                id="lilin-heading"
+                as="h2"
+                text="Simpan satu harapan kecil sebelum meniup lilinnya."
+                className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.85rem,3.3vw,2.85rem)]"
               />
-            </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              {isLit ? (
-                <motion.button
-                  type="button"
-                  whileTap={{ scale: 0.985 }}
-                  onPointerDown={handlePointerDown}
-                  onPointerUp={handlePointerCancelOrLeave}
-                  onPointerLeave={handlePointerCancelOrLeave}
-                  onPointerCancel={handlePointerCancelOrLeave}
-                  onClick={handleClickBlow}
-                  className="relative overflow-hidden inline-flex min-h-12 items-center gap-2.5 rounded-[8px] bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  {isHolding && !prefersReducedMotion && (
-                    <motion.span
-                      aria-hidden="true"
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.8, ease: 'linear' }}
-                      className="absolute inset-0 origin-left bg-black/20"
-                    />
-                  )}
-                  <Wind className="relative z-10 h-4 w-4" aria-hidden="true" />
-                  <span className="relative z-10">
-                    {isHolding ? 'Meniup perlahan...' : 'Tiup Lilin'}
-                  </span>
-                </motion.button>
-              ) : (
-                <motion.button
-                  type="button"
-                  whileTap={{ scale: 0.985 }}
-                  onClick={handleRelight}
-                  className="inline-flex min-h-12 items-center gap-2 rounded-[8px] border border-border-hairline bg-surface px-5 py-3 text-sm font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                >
-                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                  <span>Nyalakan Ulang</span>
-                </motion.button>
-              )}
+              <p className="mt-4 max-w-[54ch] text-base leading-relaxed text-muted">
+                Tuliskan harapan pribadi jika ingin (hanya tersimpan di layar ini dan tidak dikirim ke mana pun), lalu klik atau tahan tombol di bawah untuk memadamkan api.
+              </p>
 
-              <span className="text-xs text-muted">
-                {isLit
-                  ? 'Klik sekali atau tahan 0,8 detik'
-                  : 'Lilin telah padam'}
-              </span>
+              <div className="mt-7 max-w-md">
+                <label
+                  htmlFor="private-wish-input"
+                  className="block text-sm font-medium text-ink mb-2"
+                >
+                  Harapan pribadi (opsional)
+                </label>
+                <input
+                  id="private-wish-input"
+                  type="text"
+                  value={wishText}
+                  onChange={(e) => setWishText(e.target.value)}
+                  placeholder="Contoh: selalu diberi ketenangan dan kesehatan"
+                  maxLength={140}
+                  className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-canvas px-4 py-2.5 text-sm text-ink placeholder:text-muted/75 focus:border-accent"
+                />
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {isLit ? (
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.985 }}
+                    onPointerDown={handlePointerDown}
+                    onPointerUp={handlePointerCancelOrLeave}
+                    onPointerLeave={handlePointerCancelOrLeave}
+                    onPointerCancel={handlePointerCancelOrLeave}
+                    onClick={handleClickBlow}
+                    className="relative overflow-hidden inline-flex min-h-12 items-center gap-2.5 rounded-[8px] bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    {isHolding && !prefersReducedMotion && (
+                      <motion.span
+                        aria-hidden="true"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.8, ease: 'linear' }}
+                        className="absolute inset-0 origin-left bg-black/20"
+                      />
+                    )}
+                    <Wind className="relative z-10 h-4 w-4" aria-hidden="true" />
+                    <span className="relative z-10">
+                      {isHolding ? 'Meniup perlahan...' : 'Tiup Lilin'}
+                    </span>
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.985 }}
+                    onClick={handleRelight}
+                    className="inline-flex min-h-12 items-center gap-2 rounded-[8px] border border-border-hairline bg-surface px-5 py-3 text-sm font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    <span>Nyalakan Ulang</span>
+                  </motion.button>
+                )}
+
+                <span className="text-xs text-muted">
+                  {isLit
+                    ? 'Klik sekali atau tahan 0,8 detik'
+                    : 'Lilin telah padam'}
+                </span>
+              </div>
             </div>
           </ScrollRevealStage>
 
           <ScrollRevealStage variant="clip" delay={0.08} className="min-w-0 lg:col-span-6">
-            <div className="rounded-[12px] border border-border-hairline bg-surface px-6 py-10 sm:px-10 sm:py-12 text-center">
+            <div className="paper-panel-tinted rounded-[12px] border px-6 py-10 sm:px-10 sm:py-12 text-center">
               <div className="mx-auto flex justify-center">
                 <svg
                   viewBox="0 0 280 240"
@@ -190,10 +192,18 @@ export function CandleSection({
                   role="img"
                   aria-label={
                     isLit
-                      ? 'Ilustrasi garis kue ulang tahun dengan satu lilin menyala'
-                      : 'Ilustrasi garis kue ulang tahun dengan lilin baru saja dipadamkan dan kepulan asap tipis'
+                      ? 'Ilustrasi kue ulang tahun dengan satu lilin menyala hangat di tengah senja'
+                      : 'Ilustrasi kue ulang tahun dengan lilin baru saja dipadamkan dan kepulan asap tipis'
                   }
                 >
+                  <defs>
+                    <radialGradient id="candle-twilight-halo" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#FFE29E" stopOpacity="0.58" />
+                      <stop offset="48%" stopColor="#EAA4B6" stopOpacity="0.22" />
+                      <stop offset="100%" stopColor="#EAA4B6" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+
                   {isLit ? (
                     <motion.g
                       key="candle-flame"
@@ -202,7 +212,7 @@ export function CandleSection({
                         prefersReducedMotion
                           ? { opacity: 1, scale: 1 }
                           : {
-                              opacity: [0.92, 1, 0.95, 1],
+                              opacity: [0.94, 1, 0.96, 1],
                               scaleX: [1, 0.94, 1.04, 1],
                               scaleY: [1, 1.06, 0.97, 1],
                             }
@@ -211,21 +221,22 @@ export function CandleSection({
                         prefersReducedMotion
                           ? { duration: 0.2 }
                           : {
-                              duration: 1.9,
+                              duration: 2.1,
                               repeat: Infinity,
                               ease: 'easeInOut',
                             }
                       }
                       style={{ transformOrigin: '140px 76px' }}
                     >
+                      {/* Focused warm candle halo standing out against the twilight sky */}
+                      <circle cx="140" cy="56" r="46" fill="url(#candle-twilight-halo)" />
                       <path
-                        d="M140 34 C149 48 153 60 149 70 C146 76 134 76 131 70 C127 60 131 48 140 34 Z"
-                        fill="var(--accent)"
+                        d="M140 32 C150 47 154 60 150 70 C147 76 133 76 130 70 C126 60 130 47 140 32 Z"
+                        fill="#F4B966"
                       />
                       <path
-                        d="M140 50 C144 58 145 64 143 69 C142 72 138 72 137 69 C135 64 136 58 140 50 Z"
-                        fill="var(--canvas)"
-                        opacity="0.88"
+                        d="M140 46 C145 55 146 63 144 69 C142 72 138 72 136 69 C134 63 135 55 140 46 Z"
+                        fill="#FFF6DF"
                       />
                     </motion.g>
                   ) : (
@@ -240,8 +251,16 @@ export function CandleSection({
                         stroke="var(--muted)"
                         strokeWidth="1.6"
                         strokeLinecap="round"
-                        initial={prefersReducedMotion ? { opacity: 0.6 } : { pathLength: 0, opacity: 0, y: 6 }}
-                        animate={prefersReducedMotion ? { opacity: 0.6 } : { pathLength: 1, opacity: [0, 0.75, 0.35], y: -8 }}
+                        initial={
+                          prefersReducedMotion
+                            ? { opacity: 0.6 }
+                            : { pathLength: 0, opacity: 0, y: 6 }
+                        }
+                        animate={
+                          prefersReducedMotion
+                            ? { opacity: 0.6 }
+                            : { pathLength: 1, opacity: [0, 0.75, 0.35], y: -8 }
+                        }
                         transition={{ duration: 1.8, ease: 'easeOut' }}
                       />
                       <motion.path
@@ -250,14 +269,21 @@ export function CandleSection({
                         stroke="var(--muted)"
                         strokeWidth="1.1"
                         strokeLinecap="round"
-                        initial={prefersReducedMotion ? { opacity: 0.4 } : { pathLength: 0, opacity: 0, y: 4 }}
-                        animate={prefersReducedMotion ? { opacity: 0.4 } : { pathLength: 1, opacity: [0, 0.5, 0.2], y: -10 }}
+                        initial={
+                          prefersReducedMotion
+                            ? { opacity: 0.4 }
+                            : { pathLength: 0, opacity: 0, y: 4 }
+                        }
+                        animate={
+                          prefersReducedMotion
+                            ? { opacity: 0.4 }
+                            : { pathLength: 1, opacity: [0, 0.5, 0.2], y: -10 }
+                        }
                         transition={{ duration: 2.1, delay: 0.15, ease: 'easeOut' }}
                       />
                     </motion.g>
                   )}
 
-                  {/* Candle wick and beeswax body */}
                   <line
                     x1="140"
                     y1="76"
@@ -278,7 +304,6 @@ export function CandleSection({
                     strokeWidth="1.5"
                   />
 
-                  {/* Minimalist single-tier editorial cake */}
                   <rect
                     x="74"
                     y="134"
@@ -304,7 +329,6 @@ export function CandleSection({
                     strokeWidth="1.2"
                   />
 
-                  {/* Archival ceramic stand */}
                   <line
                     x1="46"
                     y1="192"
@@ -345,7 +369,7 @@ export function CandleSection({
                     >
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-accent">
                         <Flame className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Lilin menyala</span>
+                        <span>Lilin menyala di senja hari</span>
                       </span>
                       <p className="mt-2 font-serif text-xl text-ink">
                         Ambil napas sebentar, lalu sampaikan harapan terbaikmu.

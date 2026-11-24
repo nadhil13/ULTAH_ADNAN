@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_ARCHIVE_PHOTOS,
   DEFAULT_BIRTHDAY_CONFIG,
   STORAGE_KEYS,
-  type ArchiveCategory,
   type ArchivePhoto,
   type BirthdayConfig,
   type WishEntry,
 } from './data/birthdayConfig';
 import { SmoothScrollProvider } from './hooks/useSmoothScroll';
-import { useAmbientAudio } from './hooks/useAmbientAudio';
+import { SoundtrackProvider, useSoundtrack } from './hooks/useSoundtrack';
 import { normalizeConfig, normalizeWishes } from './utils/validation';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
@@ -56,15 +55,124 @@ function loadInitialTheme(): boolean {
   }
 }
 
+interface MonographContentProps {
+  config: BirthdayConfig;
+  wishes: WishEntry[];
+  photos: ArchivePhoto[];
+  isDark: boolean;
+  personalizeOpen: boolean;
+  onToggleTheme: () => void;
+  onOpenPersonalize: () => void;
+  onClosePersonalize: () => void;
+  onSaveConfig: (nextConfig: BirthdayConfig) => void;
+  onResetDefaultConfig: () => void;
+  onAddWish: (entry: Omit<WishEntry, 'id' | 'createdAt'>) => void;
+  onDeleteWish: (id: string) => void;
+}
+
+function MonographContent({
+  config,
+  wishes,
+  photos,
+  isDark,
+  personalizeOpen,
+  onToggleTheme,
+  onOpenPersonalize,
+  onClosePersonalize,
+  onSaveConfig,
+  onResetDefaultConfig,
+  onAddWish,
+  onDeleteWish,
+}: MonographContentProps) {
+  const soundtrack = useSoundtrack();
+
+  const handleResetAll = useCallback(() => {
+    soundtrack.clearCustomAudio();
+    onResetDefaultConfig();
+  }, [onResetDefaultConfig, soundtrack]);
+
+  return (
+    <div className="relative min-h-screen text-ink">
+      <LivingHeritageBackdrop isDark={isDark} />
+
+      <a
+        href="#konten-utama"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[8px] focus:bg-accent focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-accent-ink"
+      >
+        Langsung ke isi utama
+      </a>
+
+      <Navbar
+        celebrantName={config.celebrantName}
+        isDark={isDark}
+        onToggleTheme={onToggleTheme}
+        soundtrack={soundtrack}
+        onOpenPersonalize={onOpenPersonalize}
+      />
+
+      <ChapterRail />
+
+      <main id="konten-utama" className="relative z-10">
+        <HeroSection
+          config={config}
+          onOpenPersonalize={onOpenPersonalize}
+          onStartAudio={soundtrack.playFromGesture}
+        />
+
+        <DedicationSection
+          dedicationParagraph={config.dedicationParagraph}
+          dedicationClosingPhrase={config.dedicationClosingPhrase}
+          senderName={config.senderName}
+        />
+
+        <ChaptersSection />
+
+        <ArchiveSection
+          photos={photos}
+          onSetAudioDucking={soundtrack.setDucking}
+        />
+
+        <LetterSection config={config} />
+
+        <CandleSection
+          config={config}
+          isDark={isDark}
+          onOpenPersonalize={onOpenPersonalize}
+        />
+
+        <WishWallSection
+          wishes={wishes}
+          celebrantName={config.celebrantName}
+          onAddWish={onAddWish}
+          onDeleteWish={onDeleteWish}
+        />
+      </main>
+
+      <Footer
+        celebrantName={config.celebrantName}
+        senderName={config.senderName}
+      />
+
+      <PersonalizationDrawer
+        isOpen={personalizeOpen}
+        config={config}
+        customTrackName={soundtrack.customTrackName}
+        onClose={onClosePersonalize}
+        onSave={onSaveConfig}
+        onResetDefault={handleResetAll}
+        onUploadCustomAudio={soundtrack.loadCustomAudio}
+        onClearCustomAudio={soundtrack.clearCustomAudio}
+      />
+    </div>
+  );
+}
+
 export default function App() {
   const [config, setConfig] = useState<BirthdayConfig>(loadInitialConfig);
   const [wishes, setWishes] = useState<WishEntry[]>(loadInitialWishes);
-  const [photos, setPhotos] = useState<ArchivePhoto[]>(DEFAULT_ARCHIVE_PHOTOS);
+  const photos = DEFAULT_ARCHIVE_PHOTOS;
   const [isDark, setIsDark] = useState<boolean>(loadInitialTheme);
   const [personalizeOpen, setPersonalizeOpen] = useState(false);
-
-  const objectUrlsRef = useRef<string[]>([]);
-  const audio = useAmbientAudio();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -96,12 +204,6 @@ export default function App() {
     }
   }, [wishes]);
 
-  useEffect(() => {
-    return () => {
-      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, []);
-
   const handleToggleTheme = useCallback(() => {
     setIsDark((prev) => !prev);
   }, []);
@@ -110,54 +212,13 @@ export default function App() {
     setConfig(nextConfig);
   }, []);
 
-  const handleResetDefault = useCallback(() => {
+  const handleResetDefaultConfig = useCallback(() => {
     setConfig(DEFAULT_BIRTHDAY_CONFIG);
-    audio.clearCustomAudio();
     try {
       window.localStorage.removeItem(STORAGE_KEYS.config);
     } catch {
       // Ignore storage removal errors.
     }
-  }, [audio]);
-
-  const handleAddLocalPhoto = useCallback(
-    (file: File, category: Exclude<ArchiveCategory, 'Semua'>) => {
-      const objectUrl = URL.createObjectURL(file);
-      objectUrlsRef.current.push(objectUrl);
-
-      const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim();
-      const todayLabel = new Intl.DateTimeFormat('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }).format(new Date());
-
-      const newPhoto: ArchivePhoto = {
-        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        src: objectUrl,
-        alt: cleanTitle ? `Foto lokal: ${cleanTitle}` : 'Foto lokal unggahan pengguna',
-        caption: cleanTitle
-          ? `${cleanTitle}, ditambahkan ke arsip sesi ini.`
-          : 'Foto lokal yang baru saja ditambahkan ke arsip sesi ini.',
-        dateLabel: `Unggahan lokal, ${todayLabel}`,
-        category,
-        aspect: '4/3',
-        isUserUploaded: true,
-      };
-
-      setPhotos((prev) => [newPhoto, ...prev]);
-    },
-    []
-  );
-
-  const handleRemovePhoto = useCallback((id: string) => {
-    setPhotos((prev) => {
-      const target = prev.find((item) => item.id === id);
-      if (target?.isUserUploaded) {
-        URL.revokeObjectURL(target.src);
-      }
-      return prev.filter((item) => item.id !== id);
-    });
   }, []);
 
   const handleAddWish = useCallback((entry: Omit<WishEntry, 'id' | 'createdAt'>) => {
@@ -177,83 +238,22 @@ export default function App() {
 
   return (
     <SmoothScrollProvider>
-      <div className="relative min-h-screen text-ink">
-        <LivingHeritageBackdrop isDark={isDark} />
-
-        <a
-          href="#konten-utama"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[8px] focus:bg-accent focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-accent-ink"
-        >
-          Langsung ke isi utama
-        </a>
-
-        <Navbar
-          celebrantName={config.celebrantName}
-          isDark={isDark}
-          onToggleTheme={handleToggleTheme}
-          isPlayingAudio={audio.isPlaying}
-          audioVolume={audio.volume}
-          customTrackName={audio.customTrackName}
-          onToggleAudio={audio.toggle}
-          onChangeVolume={audio.setVolume}
-          onOpenPersonalize={() => setPersonalizeOpen(true)}
-        />
-
-        <ChapterRail />
-
-        <main id="konten-utama" className="relative z-10">
-          <HeroSection
-            config={config}
-            onOpenPersonalize={() => setPersonalizeOpen(true)}
-            onStartAudio={audio.startIfPaused}
-          />
-
-          <DedicationSection
-            dedicationParagraph={config.dedicationParagraph}
-            dedicationClosingPhrase={config.dedicationClosingPhrase}
-            senderName={config.senderName}
-          />
-
-          <ChaptersSection />
-
-          <ArchiveSection
-            photos={photos}
-            onAddLocalPhoto={handleAddLocalPhoto}
-            onRemovePhoto={handleRemovePhoto}
-          />
-
-          <LetterSection config={config} />
-
-          <CandleSection
-            config={config}
-            isDark={isDark}
-            onOpenPersonalize={() => setPersonalizeOpen(true)}
-          />
-
-          <WishWallSection
-            wishes={wishes}
-            celebrantName={config.celebrantName}
-            onAddWish={handleAddWish}
-            onDeleteWish={handleDeleteWish}
-          />
-        </main>
-
-        <Footer
-          celebrantName={config.celebrantName}
-          senderName={config.senderName}
-        />
-
-        <PersonalizationDrawer
-          isOpen={personalizeOpen}
+      <SoundtrackProvider youtubeVideoId={config.youtubeVideoId}>
+        <MonographContent
           config={config}
-          customTrackName={audio.customTrackName}
-          onClose={() => setPersonalizeOpen(false)}
-          onSave={handleSaveConfig}
-          onResetDefault={handleResetDefault}
-          onUploadCustomAudio={audio.loadCustomAudio}
-          onClearCustomAudio={audio.clearCustomAudio}
+          wishes={wishes}
+          photos={photos}
+          isDark={isDark}
+          personalizeOpen={personalizeOpen}
+          onToggleTheme={handleToggleTheme}
+          onOpenPersonalize={() => setPersonalizeOpen(true)}
+          onClosePersonalize={() => setPersonalizeOpen(false)}
+          onSaveConfig={handleSaveConfig}
+          onResetDefaultConfig={handleResetDefaultConfig}
+          onAddWish={handleAddWish}
+          onDeleteWish={handleDeleteWish}
         />
-      </div>
+      </SoundtrackProvider>
     </SmoothScrollProvider>
   );
 }

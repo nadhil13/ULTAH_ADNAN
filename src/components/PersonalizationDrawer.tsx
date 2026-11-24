@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Music, RotateCcw, Upload, X } from 'lucide-react';
+import { Music, RotateCcw, X } from 'lucide-react';
 import {
   DEFAULT_PORTRAIT_IMAGE,
+  DEFAULT_YOUTUBE_TRACK_TITLE,
+  DEFAULT_YOUTUBE_VIDEO_ID,
   type BirthdayConfig,
 } from '../data/birthdayConfig';
-import { parseLetterTextToParagraphs } from '../utils/validation';
+import {
+  extractYouTubeVideoId,
+  parseLetterTextToParagraphs,
+} from '../utils/validation';
 
 interface PersonalizationDrawerProps {
   isOpen: boolean;
@@ -35,13 +40,13 @@ export function PersonalizationDrawer({
   const [senderName, setSenderName] = useState(config.senderName);
   const [portraitUrl, setPortraitUrl] = useState(config.portraitUrl);
   const [portraitCaption, setPortraitCaption] = useState(config.portraitCaption);
+  const [youtubeInput, setYoutubeInput] = useState(config.youtubeVideoId);
+  const [youtubeError, setYoutubeError] = useState<string | null>(null);
   const [letterText, setLetterText] = useState(config.letterBody.join('\n\n'));
   const [surpriseTitle, setSurpriseTitle] = useState(config.surpriseTitle);
   const [surpriseSubtitle, setSurpriseSubtitle] = useState(config.surpriseSubtitle);
   const [surpriseNote, setSurpriseNote] = useState(config.surpriseNote);
-  const [portraitNotice, setPortraitNotice] = useState<string | null>(null);
 
-  const portraitInputRef = useRef<HTMLInputElement | null>(null);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -53,11 +58,12 @@ export function PersonalizationDrawer({
       setSenderName(config.senderName);
       setPortraitUrl(config.portraitUrl);
       setPortraitCaption(config.portraitCaption);
+      setYoutubeInput(config.youtubeVideoId);
+      setYoutubeError(null);
       setLetterText(config.letterBody.join('\n\n'));
       setSurpriseTitle(config.surpriseTitle);
       setSurpriseSubtitle(config.surpriseSubtitle);
       setSurpriseNote(config.surpriseNote);
-      setPortraitNotice(null);
     }
   }, [config, isOpen]);
 
@@ -74,23 +80,6 @@ export function PersonalizationDrawer({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
 
-  const handlePortraitFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setPortraitUrl(reader.result);
-        setPortraitCaption(`Potret lokal: ${file.name}`);
-        setPortraitNotice(`Foto "${file.name}" siap disimpan.`);
-      }
-    };
-    reader.readAsDataURL(file);
-    event.target.value = '';
-  };
-
   const handleAudioFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -102,6 +91,18 @@ export function PersonalizationDrawer({
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const trimmedYt = youtubeInput.trim();
+    const parsedVideoId = trimmedYt
+      ? extractYouTubeVideoId(trimmedYt)
+      : DEFAULT_YOUTUBE_VIDEO_ID;
+    if (trimmedYt && !parsedVideoId) {
+      setYoutubeError(
+        'Masukkan tautan YouTube yang valid (contoh: youtu.be/koZK67e1C-U) atau ID 11 karakter.'
+      );
+      return;
+    }
+
     const parsedParagraphs = parseLetterTextToParagraphs(letterText);
     const cleanedCelebrant = celebrantName.trim() || config.celebrantName;
     const cleanedSender = senderName.trim() || config.senderName;
@@ -121,6 +122,7 @@ export function PersonalizationDrawer({
       surpriseTitle: surpriseTitle.trim() || config.surpriseTitle,
       surpriseSubtitle: surpriseSubtitle.trim() || config.surpriseSubtitle,
       surpriseNote: surpriseNote.trim() || config.surpriseNote,
+      youtubeVideoId: parsedVideoId || DEFAULT_YOUTUBE_VIDEO_ID,
       customAudioName: customTrackName,
     });
     onClose();
@@ -150,7 +152,10 @@ export function PersonalizationDrawer({
           >
             <div className="flex items-center justify-between gap-4 border-b border-border-hairline px-6 py-4">
               <div>
-                <h2 id="personalize-title" className="font-serif text-xl font-medium text-ink">
+                <h2
+                  id="personalize-title"
+                  className="font-serif text-xl font-medium text-ink"
+                >
                   Ubah Data Monograf
                 </h2>
                 <p className="text-xs text-muted">
@@ -167,7 +172,10 @@ export function PersonalizationDrawer({
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-y-auto px-6 py-6 space-y-6"
+            >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label
@@ -254,82 +262,89 @@ export function PersonalizationDrawer({
                 />
               </div>
 
-              <div className="border-t border-border-hairline pt-5">
-                <p className="text-sm font-medium text-ink mb-2">Potret halaman pembuka</p>
-                <input
-                  ref={portraitInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePortraitFile}
-                  className="sr-only"
-                  aria-label="Unggah foto potret halaman pembuka"
-                />
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => portraitInputRef.current?.click()}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-border-hairline bg-surface px-4 py-2 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors cursor-pointer"
+              <div className="border-t border-border-hairline pt-5 space-y-4">
+                <div>
+                  <label
+                    htmlFor="cfg-youtube-url"
+                    className="block text-sm font-medium text-ink mb-1.5"
                   >
-                    <Upload className="h-4 w-4" aria-hidden="true" />
-                    <span>Pilih Foto Lokal</span>
-                  </button>
-                  {portraitUrl !== DEFAULT_PORTRAIT_IMAGE && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPortraitUrl(DEFAULT_PORTRAIT_IMAGE);
-                        setPortraitCaption(
-                          'Lembaran arsip edisi khusus, siap diganti dengan potret pilihanmu.'
-                        );
-                        setPortraitNotice('Kembali ke karya kertas arsip bawaan.');
-                      }}
-                      className="inline-flex min-h-11 items-center rounded-[8px] px-3 text-xs text-muted hover:text-accent cursor-pointer"
-                    >
-                      Gunakan Bawaan
-                    </button>
+                    Lagu latar YouTube (tautan atau ID video)
+                  </label>
+                  <input
+                    id="cfg-youtube-url"
+                    type="text"
+                    value={youtubeInput}
+                    onChange={(e) => {
+                      setYoutubeInput(e.target.value);
+                      if (youtubeError) {
+                        setYoutubeError(null);
+                      }
+                    }}
+                    placeholder="Contoh: https://youtu.be/koZK67e1C-U"
+                    className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-surface px-3.5 py-2 text-sm text-ink focus:border-accent"
+                  />
+                  {youtubeError ? (
+                    <p role="alert" className="mt-1.5 text-xs font-medium text-accent">
+                      {youtubeError}
+                    </p>
+                  ) : (
+                    <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+                      <span>
+                        Bawaan: {DEFAULT_YOUTUBE_TRACK_TITLE} ({DEFAULT_YOUTUBE_VIDEO_ID})
+                      </span>
+                      {youtubeInput.trim() !== DEFAULT_YOUTUBE_VIDEO_ID && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setYoutubeInput(DEFAULT_YOUTUBE_VIDEO_ID);
+                            setYoutubeError(null);
+                          }}
+                          className="text-accent underline underline-offset-4 cursor-pointer"
+                        >
+                          Kembalikan ke Ari Lasso
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
-                {portraitNotice && (
-                  <p className="mt-2 text-xs text-muted">{portraitNotice}</p>
-                )}
-              </div>
 
-              <div className="border-t border-border-hairline pt-5">
-                <p className="text-sm font-medium text-ink mb-2">
-                  Musik latar pribadi (opsional)
-                </p>
-                <input
-                  ref={audioInputRef}
-                  type="file"
-                  accept="audio/*"
-                  onChange={handleAudioFile}
-                  className="sr-only"
-                  aria-label="Unggah berkas audio lokal untuk musik latar"
-                />
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => audioInputRef.current?.click()}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-border-hairline bg-surface px-4 py-2 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors cursor-pointer"
-                  >
-                    <Music className="h-4 w-4" aria-hidden="true" />
-                    <span>Unggah Audio Lokal</span>
-                  </button>
-                  {customTrackName && (
+                <div>
+                  <p className="text-xs font-medium text-ink mb-2">
+                    Atau gunakan berkas audio lokal dari perangkat
+                  </p>
+                  <input
+                    ref={audioInputRef}
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleAudioFile}
+                    className="sr-only"
+                    aria-label="Unggah berkas audio lokal untuk musik latar"
+                  />
+                  <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
-                      onClick={onClearCustomAudio}
-                      className="inline-flex min-h-11 items-center rounded-[8px] px-3 text-xs text-muted hover:text-accent cursor-pointer"
+                      onClick={() => audioInputRef.current?.click()}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-border-hairline bg-surface px-4 py-2 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors cursor-pointer"
                     >
-                      Kembali ke Ambient Bawaan
+                      <Music className="h-4 w-4" aria-hidden="true" />
+                      <span>Unggah Audio Lokal</span>
                     </button>
+                    {customTrackName && (
+                      <button
+                        type="button"
+                        onClick={onClearCustomAudio}
+                        className="inline-flex min-h-11 items-center rounded-[8px] px-3 text-xs text-muted hover:text-accent cursor-pointer"
+                      >
+                        Kembali ke Lagu YouTube
+                      </button>
+                    )}
+                  </div>
+                  {customTrackName && (
+                    <p className="mt-2 text-xs text-muted">
+                      Berkas lokal aktif: {customTrackName}
+                    </p>
                   )}
                 </div>
-                <p className="mt-2 text-xs text-muted">
-                  {customTrackName
-                    ? `Aktif: ${customTrackName} (tekan Musik di bilah atas untuk memutar)`
-                    : 'Saat ini memakai instrumen ambient Web Audio bawaan.'}
-                </p>
               </div>
 
               <div className="border-t border-border-hairline pt-5">

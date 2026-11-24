@@ -35,6 +35,49 @@ export function hasValidationErrors(errors: WishValidationErrors): boolean {
   return Boolean(errors.name || errors.message);
 }
 
+export function extractYouTubeVideoId(rawInput: string): string | null {
+  const trimmed = rawInput.trim();
+  if (!trimmed) {
+    return null;
+  }
+  if (/^[A-Za-z0-9_-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  try {
+    const normalizedUrl = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const parsed = new URL(normalizedUrl);
+    const host = parsed.hostname.replace(/^www\./i, '').toLowerCase();
+
+    if (host === 'youtu.be') {
+      const seg = parsed.pathname.split('/').filter(Boolean)[0] || '';
+      return /^[A-Za-z0-9_-]{11}$/.test(seg) ? seg : null;
+    }
+
+    if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+      const vParam = parsed.searchParams.get('v');
+      if (vParam && /^[A-Za-z0-9_-]{11}$/.test(vParam)) {
+        return vParam;
+      }
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      const markerIdx = segments.findIndex((s) =>
+        ['embed', 'shorts', 'live', 'v'].includes(s.toLowerCase())
+      );
+      if (markerIdx >= 0 && segments[markerIdx + 1]) {
+        const candidate = segments[markerIdx + 1];
+        if (/^[A-Za-z0-9_-]{11}$/.test(candidate)) {
+          return candidate;
+        }
+      }
+    }
+  } catch {
+    // Fall through to regex extraction for pasted partial snippets.
+  }
+
+  const fallbackMatch = /(?:v=|youtu\.be\/|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/.exec(trimmed);
+  return fallbackMatch ? fallbackMatch[1] : null;
+}
+
 export function normalizeConfig(
   raw: unknown,
   fallback: BirthdayConfig
@@ -44,8 +87,25 @@ export function normalizeConfig(
   }
   const obj = raw as Record<string, unknown>;
   const letterBody = Array.isArray(obj.letterBody)
-    ? obj.letterBody.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    ? obj.letterBody.filter(
+        (item): item is string => typeof item === 'string' && item.trim().length > 0
+      )
     : fallback.letterBody;
+
+  const parsedYt =
+    typeof obj.youtubeVideoId === 'string'
+      ? extractYouTubeVideoId(obj.youtubeVideoId)
+      : null;
+
+  const rawPortrait =
+    typeof obj.portraitUrl === 'string' && obj.portraitUrl.trim()
+      ? obj.portraitUrl
+      : fallback.portraitUrl;
+
+  // Upgrade legacy generated paper placeholder to Dinda's real portrait automatically.
+  const resolvedPortrait = rawPortrait.includes('hero_archival_paper_')
+    ? fallback.portraitUrl
+    : rawPortrait;
 
   return {
     celebrantName:
@@ -80,12 +140,11 @@ export function normalizeConfig(
       typeof obj.heroOpeningLine === 'string' && obj.heroOpeningLine.trim()
         ? obj.heroOpeningLine
         : fallback.heroOpeningLine,
-    portraitUrl:
-      typeof obj.portraitUrl === 'string' && obj.portraitUrl.trim()
-        ? obj.portraitUrl
-        : fallback.portraitUrl,
+    portraitUrl: resolvedPortrait,
     portraitCaption:
-      typeof obj.portraitCaption === 'string' && obj.portraitCaption.trim()
+      typeof obj.portraitCaption === 'string' &&
+      obj.portraitCaption.trim() &&
+      !obj.portraitCaption.includes('ganti dengan foto asli')
         ? obj.portraitCaption
         : fallback.portraitCaption,
     dedicationParagraph:
@@ -117,6 +176,7 @@ export function normalizeConfig(
       typeof obj.surpriseNote === 'string' && obj.surpriseNote.trim()
         ? obj.surpriseNote
         : fallback.surpriseNote,
+    youtubeVideoId: parsedYt || fallback.youtubeVideoId,
     customAudioName:
       typeof obj.customAudioName === 'string' ? obj.customAudioName : null,
   };

@@ -80,16 +80,16 @@ export function LetterSection({ config }: LetterSectionProps) {
     <section
       id="surat"
       aria-labelledby="surat-heading"
-      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
+      className="scroll-mt-20 relative py-20 sm:py-28"
     >
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
-        <div className="mb-12 max-w-2xl">
-          <p className="text-sm text-muted mb-3">Surat Tersegel</p>
+        <div className="paper-panel rounded-[12px] border p-6 sm:p-8 mb-8">
+          <p className="text-sm text-muted mb-2.5">Surat Tersegel</p>
           <WordReveal
             id="surat-heading"
             as="h2"
             text="Sepucuk surat yang dilipat rapi untuk dibaca pelan."
-            className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.9rem,3.4vw,3rem)]"
+            className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.85rem,3.3vw,2.85rem)]"
           />
         </div>
 
@@ -103,22 +103,18 @@ export function LetterSection({ config }: LetterSectionProps) {
                 exit={{ opacity: 0, y: -12, scale: 0.985, transition: { duration: 0.14 } }}
                 transition={SHEET_SPRING}
                 style={{ perspective: 900 }}
-                className="relative overflow-hidden rounded-[12px] border border-border-hairline bg-surface px-6 py-12 sm:px-12 sm:py-16"
+                className="paper-panel-tinted relative overflow-hidden rounded-[12px] border px-6 py-12 sm:px-12 sm:py-16"
               >
-                {/* Peeking archival letter paper sheet rising subtly as the flap lifts */}
                 <motion.div
                   aria-hidden="true"
                   initial={false}
                   animate={
-                    isOpening
-                      ? { y: -18, opacity: 1 }
-                      : { y: 14, opacity: 0 }
+                    isOpening ? { y: -18, opacity: 1 } : { y: 14, opacity: 0 }
                   }
                   transition={{ duration: 0.24, ease: 'easeOut' }}
                   className="pointer-events-none absolute inset-x-8 top-6 h-20 rounded-t-[8px] border border-border-hairline bg-canvas"
                 />
 
-                {/* Top triangular envelope flap that lifts open during stage === 'opening' */}
                 <motion.svg
                   aria-hidden="true"
                   viewBox="0 0 800 180"
@@ -136,7 +132,7 @@ export function LetterSection({ config }: LetterSectionProps) {
                   <path
                     d="M0 0 L400 150 L800 0"
                     fill="var(--surface)"
-                    fillOpacity="0.88"
+                    fillOpacity="0.92"
                     stroke="currentColor"
                     strokeWidth="1.2"
                   />
@@ -187,7 +183,7 @@ export function LetterSection({ config }: LetterSectionProps) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 16, scale: 0.985, transition: { duration: 0.14 } }}
                 transition={SHEET_SPRING}
-                className="elevated-sheet rounded-[12px] border border-border-hairline bg-canvas px-7 py-10 sm:px-14 sm:py-14"
+                className="paper-panel elevated-sheet rounded-[12px] border px-7 py-10 sm:px-14 sm:py-14"
               >
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border-hairline pb-6">
                   <div>
@@ -214,11 +210,11 @@ export function LetterSection({ config }: LetterSectionProps) {
                   {config.letterBody.map((paragraph, idx) => (
                     <p
                       key={idx}
-                      className={
+                      className={`whitespace-pre-line ${
                         idx === 0
                           ? 'first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:leading-none first-letter:text-accent'
                           : ''
-                      }
+                      }`}
                     >
                       {paragraph}
                     </p>
@@ -236,7 +232,7 @@ export function LetterSection({ config }: LetterSectionProps) {
                   <button
                     type="button"
                     onClick={handleCloseLetter}
-                    className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-border-hairline px-5 py-2.5 text-sm font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="inline-flex min-h-11 items-center justify-center rounded-[8px] border border-border-hairline bg-surface px-5 py-2.5 text-sm font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Lipat Kembali
                   </button>
