@@ -500,15 +500,6 @@ export const DEFAULT_ARCHIVE_PHOTOS: ArchivePhoto[] = [
     aspect: '4/5',
   },
   {
-    id: 'arsip-35',
-    src: '/img/35.jpeg',
-    alt: 'Swafoto dekat ekspresi mengantuk yang dikirim sebagai candaan harian',
-    caption: 'Kiriman swafoto candaan pengingat hari hari biasa.',
-    dateLabel: 'Lembar Arsip, Momen Kecil',
-    category: 'Momen Kecil',
-    aspect: '4/5',
-  },
-  {
     id: 'arsip-36',
     src: '/img/36.jpeg',
     alt: 'Dinda mengenakan helm dengan pose cakar jenaka di malam hari',
