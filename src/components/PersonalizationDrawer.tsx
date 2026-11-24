@@ -30,6 +30,7 @@ export function PersonalizationDrawer({
 }: PersonalizationDrawerProps) {
   const [celebrantName, setCelebrantName] = useState(config.celebrantName);
   const [turningAge, setTurningAge] = useState(config.turningAge);
+  const [birthplace, setBirthplace] = useState(config.birthplace);
   const [birthdate, setBirthdate] = useState(config.birthdate);
   const [senderName, setSenderName] = useState(config.senderName);
   const [portraitUrl, setPortraitUrl] = useState(config.portraitUrl);
@@ -47,6 +48,7 @@ export function PersonalizationDrawer({
     if (isOpen) {
       setCelebrantName(config.celebrantName);
       setTurningAge(config.turningAge);
+      setBirthplace(config.birthplace);
       setBirthdate(config.birthdate);
       setSenderName(config.senderName);
       setPortraitUrl(config.portraitUrl);
@@ -109,6 +111,7 @@ export function PersonalizationDrawer({
       ...config,
       celebrantName: cleanedCelebrant,
       turningAge: cleanedAge,
+      birthplace: birthplace.trim() || config.birthplace,
       birthdate: birthdate.trim() || config.birthdate,
       senderName: cleanedSender,
       portraitUrl: portraitUrl || DEFAULT_PORTRAIT_IMAGE,
@@ -203,6 +206,23 @@ export function PersonalizationDrawer({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label
+                    htmlFor="cfg-birthplace"
+                    className="block text-sm font-medium text-ink mb-1.5"
+                  >
+                    Tempat lahir
+                  </label>
+                  <input
+                    id="cfg-birthplace"
+                    type="text"
+                    value={birthplace}
+                    onChange={(e) => setBirthplace(e.target.value)}
+                    placeholder="Contoh: Sungai Sirah"
+                    className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-surface px-3.5 py-2 text-sm text-ink focus:border-accent"
+                  />
+                </div>
+
+                <div>
+                  <label
                     htmlFor="cfg-birthdate"
                     className="block text-sm font-medium text-ink mb-1.5"
                   >
@@ -216,22 +236,22 @@ export function PersonalizationDrawer({
                     className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-surface px-3.5 py-2 text-sm text-ink focus:border-accent"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="cfg-sender"
-                    className="block text-sm font-medium text-ink mb-1.5"
-                  >
-                    Nama pengirim
-                  </label>
-                  <input
-                    id="cfg-sender"
-                    type="text"
-                    value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
-                    className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-surface px-3.5 py-2 text-sm text-ink focus:border-accent"
-                  />
-                </div>
+              <div>
+                <label
+                  htmlFor="cfg-sender"
+                  className="block text-sm font-medium text-ink mb-1.5"
+                >
+                  Nama pengirim
+                </label>
+                <input
+                  id="cfg-sender"
+                  type="text"
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  className="w-full min-h-11 rounded-[8px] border border-border-hairline bg-surface px-3.5 py-2 text-sm text-ink focus:border-accent"
+                />
               </div>
 
               <div className="border-t border-border-hairline pt-5">

@@ -80,7 +80,7 @@ export function LetterSection({ config }: LetterSectionProps) {
     <section
       id="surat"
       aria-labelledby="surat-heading"
-      className="scroll-mt-20 border-t border-border-hairline py-24 sm:py-32"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
     >
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
         <div className="mb-12 max-w-2xl">

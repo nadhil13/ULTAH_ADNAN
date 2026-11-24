@@ -38,19 +38,19 @@ export function ScrollRevealStage({
       if (variant === 'clip') {
         gsap.fromTo(
           el,
-          { opacity: 0, clipPath: 'inset(10% 0% 0% 0%)', y: 18 },
+          { opacity: 0, clipPath: 'inset(10% 0% 0% 0%)', y: 20 },
           {
             opacity: 1,
             clipPath: 'inset(0% 0% 0% 0%)',
             y: 0,
-            duration: 0.9,
+            duration: 0.85,
             delay,
             ease: 'power3.out',
-            clearProps: 'transform,clipPath',
             scrollTrigger: {
               trigger: el,
-              start: 'top 86%',
-              once: true,
+              start: 'top 90%',
+              end: 'bottom 10%',
+              toggleActions: 'play none none reverse',
             },
           }
         );
@@ -59,18 +59,18 @@ export function ScrollRevealStage({
 
       gsap.fromTo(
         el,
-        { opacity: 0, y: 28 },
+        { opacity: 0, y: 26 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.78,
           delay,
           ease: 'power3.out',
-          clearProps: 'transform',
           scrollTrigger: {
             trigger: el,
-            start: 'top 87%',
-            once: true,
+            start: 'top 90%',
+            end: 'bottom 10%',
+            toggleActions: 'play none none reverse',
           },
         }
       );

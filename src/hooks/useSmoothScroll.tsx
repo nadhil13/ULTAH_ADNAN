@@ -12,19 +12,29 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+export interface ScrollMetrics {
+  velocity: number;
+  progress: number;
+  scrollY: number;
+}
+
 interface SmoothScrollContextValue {
   scrollTo: (target: string | number | HTMLElement, offset?: number) => void;
   refreshScrollTriggers: () => void;
+  getScrollMetrics: () => ScrollMetrics;
 }
 
 const SmoothScrollContext = createContext<SmoothScrollContextValue>({
   scrollTo: () => {},
   refreshScrollTriggers: () => {},
+  getScrollMetrics: () => ({ velocity: 0, progress: 0, scrollY: 0 }),
 });
 
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const refreshRafRef = useRef<number | null>(null);
+  const metricsRef = useRef<ScrollMetrics>({ velocity: 0, progress: 0, scrollY: 0 });
+  const lastNativeScrollRef = useRef<{ y: number; t: number }>({ y: 0, t: 0 });
 
   const refreshScrollTriggers = useCallback(() => {
     if (refreshRafRef.current !== null) {
@@ -36,6 +46,22 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         refreshRafRef.current = null;
       });
     });
+  }, []);
+
+  const getScrollMetrics = useCallback((): ScrollMetrics => {
+    const lenis = lenisRef.current;
+    if (lenis) {
+      const docHeight = Math.max(
+        1,
+        document.documentElement.scrollHeight - window.innerHeight
+      );
+      return {
+        velocity: lenis.velocity || 0,
+        progress: Math.max(0, Math.min(1, window.scrollY / docHeight)),
+        scrollY: window.scrollY,
+      };
+    }
+    return metricsRef.current;
   }, []);
 
   useEffect(() => {
@@ -52,9 +78,28 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       document.fonts.ready.then(handleFontsReady).catch(() => {});
     }
 
+    const onNativeScroll = () => {
+      const now = performance.now();
+      const y = window.scrollY;
+      const docHeight = Math.max(
+        1,
+        document.documentElement.scrollHeight - window.innerHeight
+      );
+      const dt = Math.max(16, now - lastNativeScrollRef.current.t);
+      const dy = y - lastNativeScrollRef.current.y;
+      lastNativeScrollRef.current = { y, t: now };
+      metricsRef.current = {
+        velocity: (dy / dt) * 16,
+        progress: Math.max(0, Math.min(1, y / docHeight)),
+        scrollY: y,
+      };
+    };
+
     if (prefersReducedMotion) {
+      window.addEventListener('scroll', onNativeScroll, { passive: true });
       return () => {
         isDisposed = true;
+        window.removeEventListener('scroll', onNativeScroll);
       };
     }
 
@@ -65,8 +110,16 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     });
     lenisRef.current = lenis;
 
-    // Keep GSAP ScrollTrigger positions synchronized with Lenis virtual scroll.
     const onLenisScroll = () => {
+      const docHeight = Math.max(
+        1,
+        document.documentElement.scrollHeight - window.innerHeight
+      );
+      metricsRef.current = {
+        velocity: lenis.velocity || 0,
+        progress: Math.max(0, Math.min(1, window.scrollY / docHeight)),
+        scrollY: window.scrollY,
+      };
       ScrollTrigger.update();
     };
     lenis.on('scroll', onLenisScroll);
@@ -101,8 +154,8 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         offset,
         onComplete: finalizeVisibility,
       });
-      // Also schedule an update shortly after scroll initiates so jumped sections reveal cleanly.
       window.setTimeout(finalizeVisibility, 420);
+      window.setTimeout(finalizeVisibility, 820);
       return;
     }
 
@@ -122,7 +175,9 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SmoothScrollContext.Provider value={{ scrollTo, refreshScrollTriggers }}>
+    <SmoothScrollContext.Provider
+      value={{ scrollTo, refreshScrollTriggers, getScrollMetrics }}
+    >
       {children}
     </SmoothScrollContext.Provider>
   );

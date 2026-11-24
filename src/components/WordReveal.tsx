@@ -86,14 +86,14 @@ export function WordReveal({
         {
           yPercent: 0,
           opacity: 1,
-          stagger: 0.035,
-          duration: 0.75,
+          stagger: 0.032,
+          duration: 0.72,
           ease: 'power3.out',
-          clearProps: 'transform',
           scrollTrigger: {
             trigger: container,
-            start: 'top 86%',
-            once: true,
+            start: 'top 90%',
+            end: 'bottom 10%',
+            toggleActions: 'play none none reverse',
           },
         }
       );

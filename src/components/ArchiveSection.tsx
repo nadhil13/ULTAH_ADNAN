@@ -9,6 +9,7 @@ import {
   type ArchivePhoto,
 } from '../data/birthdayConfig';
 import { useSmoothScroll } from '../hooks/useSmoothScroll';
+import { EditorialPhotoFrame } from './EditorialPhotoFrame';
 import { WordReveal } from './WordReveal';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -76,13 +77,25 @@ export function ArchiveSection({
   const { refreshScrollTriggers } = useSmoothScroll();
   const [activeCategory, setActiveCategory] = useState<ArchiveCategory>('Semua');
   const [lightboxId, setLightboxId] = useState<string | null>(null);
-  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [focusedIndex, setFocusedIndex] = useState(1);
+  const [isDesktopViewport, setIsDesktopViewport] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true
+  );
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDesktopViewport(event.matches);
+    };
+    setIsDesktopViewport(mq.matches);
+    mq.addEventListener('change', handleChange);
+    return () => mq.removeEventListener('change', handleChange);
+  }, []);
 
   const filteredPhotos = useMemo(() => {
     if (activeCategory === 'Semua') {
@@ -166,28 +179,6 @@ export function ArchiveSection({
       }
     });
 
-    mm.add('(max-width: 1023px) and (prefers-reduced-motion: no-preference)', () => {
-      const cards = track.querySelectorAll<HTMLElement>('[data-archive-frame]');
-      cards.forEach((card) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 26 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.75,
-            ease: 'power3.out',
-            clearProps: 'transform',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 86%',
-              once: true,
-            },
-          }
-        );
-      });
-    });
-
     refreshScrollTriggers();
 
     return () => {
@@ -251,7 +242,7 @@ export function ArchiveSection({
       ref={sectionRef}
       id="arsip"
       aria-labelledby="arsip-heading"
-      className="scroll-mt-20 relative border-t border-border-hairline bg-canvas py-24 sm:py-28 lg:flex lg:min-h-[100dvh] lg:flex-col lg:justify-center lg:py-20"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-28 lg:flex lg:min-h-[100dvh] lg:flex-col lg:justify-center lg:py-20"
     >
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between mb-8">
@@ -345,7 +336,7 @@ export function ArchiveSection({
               Belum ada foto pada kategori {activeCategory}
             </h3>
             <p className="mx-auto mt-3 max-w-[52ch] text-sm leading-relaxed text-muted">
-              Ruang ini sengaja dibiarkan bersih agar kamu dapat menambahkan dokumentasi pribadi dari perangkatmu sendiri selama sesi ini.
+              Ruang ini sengaja disiapkan bersih untuk momen kebersamaan Dinda bersama keluarga dan sahabat. Tambahkan foto lokal dari perangkatmu sendiri selama sesi ini.
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
               <button
@@ -377,55 +368,27 @@ export function ArchiveSection({
             className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-start lg:flex lg:w-max lg:flex-nowrap lg:items-center lg:gap-10 lg:pr-12 will-change-transform"
           >
             {filteredPhotos.map((photo, idx) => (
-              <figure
+              <div
                 key={photo.id}
                 data-archive-frame
                 className={`min-w-0 lg:shrink-0 ${getMobileSpan(photo.aspect)} ${getDesktopFrameWidth(photo.aspect)}`}
               >
-                <motion.button
-                  type="button"
-                  whileHover={{ y: -4 }}
-                  whileTap={{ scale: 0.985 }}
-                  transition={SPRING_TRANSITION}
+                <EditorialPhotoFrame
+                  src={photo.src}
+                  alt={photo.alt}
+                  caption={photo.caption}
+                  metaLabel={`${formatCounterIndex(idx + 1)} / ${photo.category}`}
+                  subLabel={photo.dateLabel}
+                  aspectClass={getAspectClass(photo.aspect)}
+                  maxHeightClass="lg:max-h-[46dvh]"
+                  parallaxAxis={isDesktopViewport ? 'x' : 'y'}
+                  tiltDirection={idx % 2 === 0 ? 1 : -1}
+                  isDefaultSlot={!photo.isUserUploaded}
+                  defaultHint="Ganti dengan foto asli Dinda"
                   onClick={() => setLightboxId(photo.id)}
-                  aria-label={`Buka pratinjau penuh: ${photo.caption}`}
-                  className="group block w-full text-left focus-visible:rounded-[6px] cursor-pointer"
-                >
-                  <div
-                    className={`overflow-hidden rounded-[6px] border border-border-hairline bg-surface transition-colors group-hover:border-accent/70 lg:max-h-[46dvh] ${getAspectClass(
-                      photo.aspect
-                    )}`}
-                  >
-                    {!brokenImages[photo.id] ? (
-                      <img
-                        data-parallax-img
-                        src={photo.src}
-                        alt={photo.alt}
-                        referrerPolicy="no-referrer"
-                        onError={() =>
-                          setBrokenImages((prev) => ({ ...prev, [photo.id]: true }))
-                        }
-                        className="h-full w-full object-cover lg:scale-[1.1] will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.13]"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center">
-                        <ImageIcon className="h-7 w-7 text-muted mb-2" aria-hidden="true" />
-                        <span className="text-xs text-muted">{photo.dateLabel}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-3.5 flex items-baseline justify-between gap-4">
-                    <p className="text-sm leading-relaxed text-ink max-w-[46ch]">
-                      {photo.caption}
-                    </p>
-                    <span className="text-xs text-muted tabular-nums whitespace-nowrap shrink-0">
-                      {formatCounterIndex(idx + 1)} / {photo.category}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-muted">{photo.dateLabel}</p>
-                </motion.button>
-              </figure>
+                  ariaLabel={`Buka pratinjau penuh: ${photo.caption}`}
+                />
+              </div>
             ))}
           </div>
         </div>

@@ -5,6 +5,7 @@ interface AmbientAudioState {
   volume: number;
   customTrackName: string | null;
   toggle: () => void;
+  startIfPaused: () => void;
   setVolume: (nextVolume: number) => void;
   loadCustomAudio: (file: File) => void;
   clearCustomAudio: () => void;
@@ -151,6 +152,21 @@ export function useAmbientAudio(): AmbientAudioState {
       .catch(() => setIsPlaying(false));
   }, [isPlaying, startSynthLoop, stopSynthLoop, volume]);
 
+  const startIfPaused = useCallback(() => {
+    if (isPlaying) {
+      return;
+    }
+    if (customAudioRef.current) {
+      customAudioRef.current.volume = volume;
+      customAudioRef.current.play().catch(() => {});
+      setIsPlaying(true);
+      return;
+    }
+    startSynthLoop()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
+  }, [isPlaying, startSynthLoop, volume]);
+
   const setVolume = useCallback((nextVolume: number) => {
     const clamped = Math.max(0, Math.min(1, nextVolume));
     setVolumeState(clamped);
@@ -217,6 +233,7 @@ export function useAmbientAudio(): AmbientAudioState {
     volume,
     customTrackName,
     toggle,
+    startIfPaused,
     setVolume,
     loadCustomAudio,
     clearCustomAudio,

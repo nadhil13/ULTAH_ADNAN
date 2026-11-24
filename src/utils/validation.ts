@@ -56,6 +56,10 @@ export function normalizeConfig(
       typeof obj.turningAge === 'string' && obj.turningAge.trim()
         ? obj.turningAge
         : fallback.turningAge,
+    birthplace:
+      typeof obj.birthplace === 'string' && obj.birthplace.trim()
+        ? obj.birthplace
+        : fallback.birthplace,
     birthdate:
       typeof obj.birthdate === 'string' && obj.birthdate.trim()
         ? obj.birthdate
@@ -64,6 +68,14 @@ export function normalizeConfig(
       typeof obj.senderName === 'string' && obj.senderName.trim()
         ? obj.senderName
         : fallback.senderName,
+    coverHeaderLine:
+      typeof obj.coverHeaderLine === 'string' && obj.coverHeaderLine.trim()
+        ? obj.coverHeaderLine
+        : fallback.coverHeaderLine,
+    coverSubtitle:
+      typeof obj.coverSubtitle === 'string' && obj.coverSubtitle.trim()
+        ? obj.coverSubtitle
+        : fallback.coverSubtitle,
     heroOpeningLine:
       typeof obj.heroOpeningLine === 'string' && obj.heroOpeningLine.trim()
         ? obj.heroOpeningLine

@@ -85,8 +85,44 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
+.editorial-scrim {
+  background-color: color-mix(in srgb, var(--canvas) 91%, transparent);
+}
+
+.editorial-scrim-soft {
+  background-color: color-mix(in srgb, var(--canvas) 84%, transparent);
+}
+
 .elevated-sheet {
   box-shadow: var(--shadow-elevated);
+}
+
+@keyframes botanical-sway-left {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(1.6deg) translateY(4px);
+  }
+}
+
+@keyframes botanical-sway-right {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-1.6deg) translateY(4px);
+  }
+}
+
+.animate-breeze-left {
+  transform-origin: 0% 35%;
+  animation: botanical-sway-left 8.5s ease-in-out infinite;
+}
+
+.animate-breeze-right {
+  transform-origin: 100% 35%;
+  animation: botanical-sway-right 9.2s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { CHAPTERS_DATA, type ChapterItem } from '../data/birthdayConfig';
+import { EditorialPhotoFrame } from './EditorialPhotoFrame';
 import { ScrollRevealStage } from './ScrollRevealStage';
 import { WordReveal } from './WordReveal';
 
@@ -10,58 +11,26 @@ const CARD_SPRING = {
   mass: 0.85,
 };
 
-function ChapterCard({ chapter, index }: { chapter: ChapterItem; index: number }) {
+function ChapterRow({ chapter, index }: { chapter: ChapterItem; index: number }) {
   const isOdd = index % 2 === 1;
+  const isQuoteHighlight = chapter.layoutVariant === 'quote-highlight';
+  const isSplitCaption = chapter.layoutVariant === 'split-caption';
 
-  if (chapter.layoutVariant === 'quote-highlight') {
-    return (
-      <ScrollRevealStage
-        variant="clip"
-        delay={0.04}
-        className="md:col-span-10 md:col-start-2"
+  const narrativeCard = (
+    <ScrollRevealStage
+      variant={isQuoteHighlight ? 'clip' : 'lift'}
+      delay={0.04}
+      className={isOdd ? 'lg:col-span-7 lg:order-2' : 'lg:col-span-7 lg:order-1'}
+    >
+      <motion.article
+        whileHover={{ y: -4 }}
+        whileTap={{ scale: 0.985 }}
+        transition={CARD_SPRING}
+        className={`rounded-[12px] border border-border-hairline p-7 sm:p-10 transition-colors hover:border-accent/60 ${
+          isQuoteHighlight ? 'bg-surface' : 'bg-canvas'
+        }`}
       >
-        <motion.article
-          whileHover={{ y: -4 }}
-          whileTap={{ scale: 0.985 }}
-          transition={CARD_SPRING}
-          className="rounded-[12px] border border-border-hairline bg-surface px-7 py-10 sm:px-12 sm:py-12 transition-colors hover:border-accent/60"
-        >
-          <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border-hairline pb-4">
-            <span className="font-serif text-3xl font-medium text-accent tabular-nums">
-              {chapter.index}
-            </span>
-            <span className="text-sm text-muted">{chapter.period}</span>
-          </div>
-
-          <h3 className="mt-7 font-serif text-2xl sm:text-3xl font-medium leading-snug text-ink max-w-[34ch]">
-            {chapter.title}
-          </h3>
-
-          <p className="mt-4 max-w-[64ch] text-base leading-relaxed text-muted">
-            {chapter.summary}
-          </p>
-
-          <blockquote className="mt-8 border-t border-border-hairline pt-6 font-serif italic text-lg sm:text-xl text-ink max-w-[46ch]">
-            "{chapter.note}"
-          </blockquote>
-        </motion.article>
-      </ScrollRevealStage>
-    );
-  }
-
-  if (chapter.layoutVariant === 'split-caption') {
-    return (
-      <ScrollRevealStage
-        variant="lift"
-        delay={0.04}
-        className="md:col-span-9 md:col-start-4"
-      >
-        <motion.article
-          whileHover={{ y: -4 }}
-          whileTap={{ scale: 0.985 }}
-          transition={CARD_SPRING}
-          className="rounded-[12px] border border-border-hairline bg-canvas p-7 sm:p-9 transition-colors hover:border-accent/60"
-        >
+        {isSplitCaption ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-12 sm:items-start">
             <div className="sm:col-span-4">
               <span className="block font-serif text-4xl font-medium text-accent tabular-nums">
@@ -73,7 +42,7 @@ function ChapterCard({ chapter, index }: { chapter: ChapterItem; index: number }
               <h3 className="font-serif text-2xl font-medium leading-snug text-ink">
                 {chapter.title}
               </h3>
-              <p className="mt-3.5 text-base leading-relaxed text-muted max-w-[58ch]">
+              <p className="mt-3.5 text-base leading-relaxed text-muted max-w-[56ch]">
                 {chapter.summary}
               </p>
               <p className="mt-5 text-xs text-muted border-t border-border-hairline pt-4">
@@ -81,43 +50,57 @@ function ChapterCard({ chapter, index }: { chapter: ChapterItem; index: number }
               </p>
             </div>
           </div>
-        </motion.article>
-      </ScrollRevealStage>
-    );
-  }
+        ) : (
+          <>
+            <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border-hairline pb-4">
+              <span className="font-serif text-3xl sm:text-4xl font-medium text-accent tabular-nums">
+                {chapter.index}
+              </span>
+              <span className="text-sm text-muted">{chapter.period}</span>
+            </div>
 
-  return (
-    <ScrollRevealStage
-      variant="lift"
-      delay={0.04}
-      className={isOdd ? 'md:col-span-8 md:col-start-5' : 'md:col-span-8 md:col-start-1'}
-    >
-      <motion.article
-        whileHover={{ y: -4 }}
-        whileTap={{ scale: 0.985 }}
-        transition={CARD_SPRING}
-        className="rounded-[12px] border border-border-hairline bg-canvas p-7 sm:p-10 transition-colors hover:border-accent/60"
-      >
-        <div className="flex items-baseline justify-between gap-4">
-          <span className="font-serif text-4xl font-medium text-accent tabular-nums">
-            {chapter.index}
-          </span>
-          <span className="text-sm text-muted">{chapter.period}</span>
-        </div>
+            <h3 className="mt-6 font-serif text-2xl sm:text-[1.8rem] font-medium leading-snug text-ink max-w-[32ch]">
+              {chapter.title}
+            </h3>
 
-        <h3 className="mt-6 font-serif text-2xl sm:text-[1.75rem] font-medium leading-snug text-ink max-w-[30ch]">
-          {chapter.title}
-        </h3>
+            <p className="mt-4 max-w-[60ch] text-base leading-relaxed text-muted">
+              {chapter.summary}
+            </p>
 
-        <p className="mt-4 max-w-[60ch] text-base leading-relaxed text-muted">
-          {chapter.summary}
-        </p>
-
-        <p className="mt-6 text-xs text-muted border-t border-border-hairline pt-4">
-          {chapter.note}
-        </p>
+            {isQuoteHighlight ? (
+              <blockquote className="mt-7 border-t border-border-hairline pt-5 font-serif italic text-lg sm:text-xl text-ink max-w-[44ch]">
+                "{chapter.note}"
+              </blockquote>
+            ) : (
+              <p className="mt-6 text-xs text-muted border-t border-border-hairline pt-4">
+                {chapter.note}
+              </p>
+            )}
+          </>
+        )}
       </motion.article>
     </ScrollRevealStage>
+  );
+
+  const visualPlate = (
+    <div className={isOdd ? 'lg:col-span-5 lg:order-1' : 'lg:col-span-5 lg:order-2'}>
+      <EditorialPhotoFrame
+        src={chapter.plateSrc}
+        alt={chapter.plateAlt}
+        subLabel={chapter.plateCaption}
+        aspectClass="aspect-[4/3]"
+        parallaxAxis="y"
+        tiltDirection={isOdd ? -1 : 1}
+        isDefaultSlot={false}
+      />
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 gap-7 lg:grid-cols-12 lg:items-center lg:gap-10">
+      {narrativeCard}
+      {visualPlate}
+    </div>
   );
 }
 
@@ -126,7 +109,7 @@ export function ChaptersSection() {
     <section
       id="babak"
       aria-labelledby="babak-heading"
-      className="scroll-mt-20 border-t border-border-hairline py-24 sm:py-32"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end mb-14 sm:mb-20">
@@ -135,23 +118,24 @@ export function ChaptersSection() {
             <WordReveal
               id="babak-heading"
               as="h2"
-              text="Empat jeda kecil dari perjalanan yang membentuk hari ini."
+              text="Empat jeda kecil dari Sungai Sirah menuju usia dua puluh dua."
               className="font-serif font-medium tracking-[-0.02em] text-ink leading-[1.14] text-[clamp(1.9rem,3.4vw,3rem)]"
             />
           </div>
           <ScrollRevealStage variant="lift" delay={0.08} className="lg:col-span-4 lg:col-start-9">
             <p className="text-sm leading-relaxed text-muted max-w-[44ch]">
-              Disusun berurutan sebagai penanda fase, dari rasa ingin tahu pertama hingga halaman bersih di usia yang baru.
+              Disusun berurutan sebagai penanda fase, dari akar yang hangat hingga halaman bersih di usia 22 tahun.
             </p>
           </ScrollRevealStage>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-y-12">
+        <div className="space-y-14 sm:space-y-20">
           {CHAPTERS_DATA.map((chapter, index) => (
-            <ChapterCard key={chapter.id} chapter={chapter} index={index} />
+            <ChapterRow key={chapter.id} chapter={chapter} index={index} />
           ))}
         </div>
       </div>
     </section>
   );
 }
+

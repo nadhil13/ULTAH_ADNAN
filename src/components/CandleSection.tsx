@@ -98,7 +98,7 @@ export function CandleSection({
     <section
       id="lilin"
       aria-labelledby="lilin-heading"
-      className="scroll-mt-20 border-t border-border-hairline py-24 sm:py-32"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
     >
       <FoilParticlesCanvas triggerKey={foilTriggerKey} isDark={isDark} />
 

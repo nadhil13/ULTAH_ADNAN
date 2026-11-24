@@ -178,7 +178,7 @@ export function DedicationSection({
       ref={sectionRef}
       id="dedikasi"
       aria-labelledby="dedikasi-heading"
-      className="scroll-mt-20 relative border-t border-border-hairline bg-canvas py-24 sm:py-28 md:flex md:min-h-[100dvh] md:flex-col md:justify-center md:py-20"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-28 md:flex md:min-h-[100dvh] md:flex-col md:justify-center md:py-20"
     >
       <div className="mx-auto w-full max-w-4xl px-5 sm:px-8">
         <h2

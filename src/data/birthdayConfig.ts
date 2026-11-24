@@ -7,6 +7,9 @@ export interface ChapterItem {
   title: string;
   summary: string;
   note: string;
+  plateSrc: string;
+  plateAlt: string;
+  plateCaption: string;
   layoutVariant: 'wide-offset' | 'split-caption' | 'quote-highlight' | 'closing-folio';
 }
 
@@ -24,8 +27,11 @@ export interface ArchivePhoto {
 export interface BirthdayConfig {
   celebrantName: string;
   turningAge: string;
+  birthplace: string;
   birthdate: string;
   senderName: string;
+  coverHeaderLine: string;
+  coverSubtitle: string;
   heroOpeningLine: string;
   portraitUrl: string;
   portraitCaption: string;
@@ -52,29 +58,32 @@ export const DEFAULT_PORTRAIT_IMAGE =
   '/src/assets/images/hero_archival_paper_1795494087630.jpg';
 
 export const DEFAULT_BIRTHDAY_CONFIG: BirthdayConfig = {
-  celebrantName: '[NAMA PENERIMA]',
-  turningAge: '[USIA]',
-  birthdate: '2005-03-13',
-  senderName: '[NAMA PENGIRIM]',
+  celebrantName: 'Dinda Hendra Putri',
+  turningAge: '22',
+  birthplace: 'Sungai Sirah',
+  birthdate: '2004-11-24',
+  senderName: 'Orang Terdekatmu',
+  coverHeaderLine: 'Untuk merayakan dua puluh dua tahun',
+  coverSubtitle: 'Merayakan dua puluh dua tahun perjalanan',
   heroOpeningLine:
-    'Sebuah ruang tenang untuk menyimpan cerita, potongan hari yang hangat, dan doa baik pada pergantian usiamu.',
+    'Sebuah lembaran tenang untuk merayakan dua puluh dua tahun perjalananmu sejak Sungai Sirah, menyimpan kenangan kecil, dan mengirim doa terbaik bagi langkahmu berikutnya.',
   portraitUrl: DEFAULT_PORTRAIT_IMAGE,
-  portraitCaption: 'Lembaran arsip edisi khusus, siap diganti dengan potret pilihanmu.',
+  portraitCaption: 'Bingkai arsip edisi 22 tahun, ganti dengan foto asli Dinda di Ubah Data.',
   dedicationParagraph:
-    'Bertambah usia bukan sekadar menghitung angka di kalender, melainkan merawat setiap jejak yang membuatmu tetap menjadi diri sendiri. Semoga tahun yang baru ini memberimu ruang lebih luas untuk bernapas, waktu yang cukup untuk hal yang benar benar berarti, serta keberanian yang tenang saat melangkah ke babak berikutnya.',
+    'Dua puluh dua tahun sejak pagi pertama di Sungai Sirah bukan sekadar deretan angka di kalender, melainkan jejak ketekunan, kelembutan, dan keberanianmu bertumbuh menjadi diri sendiri. Semoga tahun baru dalam usiamu ini selalu memberimu ruang lebih luas untuk bernapas, waktu yang cukup bagi hal yang benar benar berarti, serta langkah yang teduh di mana pun kamu berada.',
   dedicationClosingPhrase:
-    'Terima kasih sudah bertumbuh sejauh ini dengan cara yang jujur dan hangat.',
-  letterSalutation: 'Untuk [NAMA PENERIMA],',
+    'Terima kasih sudah bertumbuh sejauh ini dengan hati yang hangat dan jujur, Dinda.',
+  letterSalutation: 'Untuk Dinda Hendra Putri,',
   letterBody: [
-    'Hari ini menjadi penanda satu putaran lagi yang telah kamu lalui dengan segala dinamikanya. Tidak semua hari berjalan ringan, tetapi cara kamu bertahan dan tetap peduli pada hal hal kecil di sekitarmu layak dirayakan dengan penuh rasa syukur.',
-    'Di usia yang baru ini, semoga langkahmu selalu ditemani kesehatan yang terjaga, pikiran yang jernih, dan orang orang yang mengerti kapan harus berbicara serta kapan cukup duduk menemani. Kamu tidak perlu terburu buru mengejar standar siapa pun, cukup berjalan pada ritme yang terasa paling jujur bagimu.',
-    'Simpan halaman ini kapan saja kamu ingin mengingat bahwa kehadiranmu berarti. Selamat ulang tahun, semoga setiap bulan ke depan membawa kabar baik yang tenang dan menetap lama.',
+    'Selamat memasuki usia dua puluh dua tahun, Dinda. Hari ini menjadi pengingat yang lembut atas semua perjalanan yang sudah kamu tempuh sejak langkah pertamamu di Sungai Sirah hingga hari ini. Tidak semua musim berjalan ringan, tetapi ketenanganmu saat bertahan dan caramu tetap peduli pada orang di sekitarmu layak dirayakan dengan penuh syukur.',
+    'Di babak usia 22 ini, semoga kesehatan selalu menyertaimu, pikiranmu tetap lapang di tengah hari yang padat, dan setiap keputusan penting yang kamu ambil membawa kedamaian. Kamu tidak perlu terburu buru mengikuti ukuran siapa pun, cukup melangkah pada irama yang paling jujur bagi hatimu sendiri.',
+    'Kapan pun hari terasa panjang, bukalah kembali lembaran ini untuk mengingat bahwa kehadiranmu selalu berarti. Semoga bulan bulan menuju tahun berikutnya dipenuhi kabar baik yang menetap lama.',
   ],
-  letterClosing: 'Dengan doa yang hangat,',
-  surpriseTitle: 'Kupon Makan Malam dan Jalan Jalan Pilihanmu',
-  surpriseSubtitle: 'Berlaku kapan saja sepanjang tahun usiamu yang baru',
+  letterClosing: 'Dengan doa yang tulus dan hangat,',
+  surpriseTitle: 'Kupon Makan Malam dan Jalan Jalan Pilihan Dinda',
+  surpriseSubtitle: 'Berlaku kapan saja sepanjang usia 22 tahun',
   surpriseNote:
-    'Pilih tempat makan, kedai kopi, atau rute perjalanan singkat yang paling ingin kamu datangi. Cukup tunjukkan kartu ini untuk menukarkannya.',
+    'Pilih tempat makan favorit, kedai kopi yang ingin disinggahi, atau perjalanan sore yang tenang bersama. Tunjukkan kartu ini kapan pun kamu ingin menukarkannya.',
   customAudioName: null,
 };
 
@@ -82,21 +91,27 @@ export const CHAPTERS_DATA: ChapterItem[] = [
   {
     id: 'babak-01',
     index: '01',
-    period: 'Langkah Awal',
-    title: 'Belajar Mengenal Dunia dengan Rasa Ingin Tahu',
+    period: 'Akar di Sungai Sirah',
+    title: 'Langkah Pertama dari Tanah yang Hangat',
     summary:
-      'Setiap kebiasaan baik hari ini berakar dari hari hari sederhana di masa lalu. Dari pertanyaan kecil yang terus dicari jawabannya hingga keberanian mencoba hal baru tanpa takut salah.',
-    note: 'Catatan: kamu dapat menyesuaikan kisah tiap babak langsung di berkas konfigurasi.',
+      'Setiap kebaikan yang tumbuh dalam dirimu hari ini berawal dari hari hari sederhana di masa kecil. Dari rasa ingin tahu yang tulus hingga kehangatan rumah yang mengajarkan arti pulang dan syukur.',
+    note: 'Akar yang tenang selalu memberi kekuatan pada ranting yang tumbuh tinggi.',
+    plateSrc: '/src/assets/images/archive_morning_train_1795494077449.jpg',
+    plateAlt: 'Kabut pagi di perbukitan hijau yang dilihat dari balik jendela kereta',
+    plateCaption: 'Pagi di perbukitan, ganti dengan foto asli Dinda',
     layoutVariant: 'wide-offset',
   },
   {
     id: 'babak-02',
     index: '02',
     period: 'Masa Bertumbuh',
-    title: 'Menemukan Ritme Sendiri di Tengah Banyak Pilihan',
+    title: 'Menemukan Irama Sendiri di Tengah Banyak Pilihan',
     summary:
-      'Ada masa ketika segala sesuatu terasa bergerak cepat. Di titik itu, kamu mulai memilih mana yang perlu diperjuangkan dan mana yang pantas dilepaskan dengan lapang.',
-    note: 'Keputusan kecil yang diambil dengan sadar sering kali mengubah arah perjalanan paling jauh.',
+      'Memasuki awal dua puluhan membawa banyak persimpangan baru. Di fase ini, kamu belajar memilih mana yang patut diperjuangkan dengan sungguh sungguh dan mana yang lebih baik dilepaskan dengan lapang.',
+    note: 'Keputusan kecil yang diambil dengan jernih sering kali membawa perjalanan paling jauh.',
+    plateSrc: '/src/assets/images/archive_quiet_coffee_1795494204809.jpg',
+    plateAlt: 'Secangkir kopi keramik hangat di samping buku catatan bersampul linen',
+    plateCaption: 'Catatan pagi dan jeda belajar, ganti dengan foto asli Dinda',
     layoutVariant: 'split-caption',
   },
   {
@@ -105,18 +120,24 @@ export const CHAPTERS_DATA: ChapterItem[] = [
     period: 'Jeda yang Jujur',
     title: 'Merawat Hal Hal Sederhana yang Membuat Hati Utuh',
     summary:
-      'Di sela kesibukan, kamu belajar bahwa istirahat bukan tanda berhenti. Secangkir minuman hangat di pagi hari, percakapan tanpa tergesa, dan sore yang tenang selalu cukup untuk memulihkan tenaga.',
-    note: 'Ketekunan yang paling tahan lama selalu tumbuh bersama ketenangan.',
+      'Di sela kesibukan, kamu membuktikan bahwa beristirahat bukanlah tanda berhenti. Secangkir minuman hangat, hujan sore yang pelan, dan percakapan tanpa tergesa selalu cukup untuk mengisi ulang tenaga.',
+    note: 'Ketekunan yang paling tahan lama selalu berjalan beriringan dengan ketenangan.',
+    plateSrc: '/src/assets/images/archive_linen_books_1795494088722.jpg',
+    plateAlt: 'Tumpukan buku bersampul kain di atas linen lembut dengan sekuntum kamelia merah tua',
+    plateCaption: 'Bacaan sore yang tenang, ganti dengan foto asli Dinda',
     layoutVariant: 'quote-highlight',
   },
   {
     id: 'babak-04',
     index: '04',
-    period: 'Lembaran Baru',
-    title: 'Menyambut Tahun yang Baru dengan Ruang Lebih Lapang',
+    period: 'Menyambut Usia 22',
+    title: 'Membuka Lembaran Baru dengan Ruang Lebih Lapang',
     summary:
-      'Usia baru membuka halaman yang masih bersih. Semoga kamu melangkah dengan hati yang ringan, tetap rendah hati saat berhasil, dan tetap ramah pada diri sendiri ketika sedang belajar.',
-    note: 'Babak ini baru saja dimulai hari ini.',
+      'Dua puluh dua tahun membuka halaman yang masih bersih dan penuh kemungkinan. Semoga kamu terus melangkah dengan hati ringan, tetap rendah hati saat berhasil, dan tetap ramah pada diri sendiri ketika belajar.',
+    note: 'Babak usia 22 tahun resmi dimulai hari ini, 24 November 2026.',
+    plateSrc: '/src/assets/images/archive_sunlit_corridor_1795496376381.jpg',
+    plateAlt: 'Cahaya sore yang jatuh lembut di sepanjang koridor galeri dengan bangku kayu',
+    plateCaption: 'Cahaya sore menuju babak baru, ganti dengan foto asli Dinda',
     layoutVariant: 'closing-folio',
   },
 ];
@@ -126,7 +147,7 @@ export const DEFAULT_ARCHIVE_PHOTOS: ArchivePhoto[] = [
     id: 'arsip-01',
     src: '/src/assets/images/archive_morning_train_1795494077449.jpg',
     alt: 'Pemandangan kabut pagi di perbukitan dari jendela kereta',
-    caption: 'Pagi yang pelan dari balik jendela kereta, saat udara masih dingin dan jalan masih panjang.',
+    caption: 'Pagi berkabut yang pelan di perbukitan, tempat segala perjalanan panjang bermula.',
     dateLabel: 'Arsip 01, Perjalanan',
     category: 'Perjalanan',
     aspect: '16/10',
@@ -135,7 +156,7 @@ export const DEFAULT_ARCHIVE_PHOTOS: ArchivePhoto[] = [
     id: 'arsip-02',
     src: '/src/assets/images/archive_quiet_coffee_1795494204809.jpg',
     alt: 'Secangkir kopi hitam keramik di samping buku catatan bersampul linen dan pena kuningan',
-    caption: 'Meja pagi sebelum hari dimulai: kopi hangat, buku catatan, dan pikiran yang tenang.',
+    caption: 'Meja pagi sebelum hari dimulai: minuman hangat, buku catatan, dan pikiran yang tenang.',
     dateLabel: 'Arsip 02, Momen Kecil',
     category: 'Momen Kecil',
     aspect: '4/5',
@@ -144,7 +165,7 @@ export const DEFAULT_ARCHIVE_PHOTOS: ArchivePhoto[] = [
     id: 'arsip-03',
     src: '/src/assets/images/archive_dusk_rain_1795494079075.jpg',
     alt: 'Tetesan hujan pada kaca jendela kayu saat senja dengan lampu jalan berpendar lembut',
-    caption: 'Hujan senja yang membuat langkah melambat sejenak, menyisakan percakapan yang hangat.',
+    caption: 'Hujan senja yang membuat langkah melambat sejenak dan percakapan terasa lebih hangat.',
     dateLabel: 'Arsip 03, Perjalanan',
     category: 'Perjalanan',
     aspect: '1/1',
@@ -186,7 +207,7 @@ export const ARCHIVE_CATEGORIES: ArchiveCategory[] = [
 ];
 
 export const STORAGE_KEYS = {
-  config: 'monograf_ulang_tahun_config_v1',
+  config: 'monograf_dinda_config_v2',
   wishes: 'monograf_ulang_tahun_wishes_v1',
   theme: 'monograf_ulang_tahun_theme_v1',
 } as const;

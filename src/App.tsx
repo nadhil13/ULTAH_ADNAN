@@ -22,6 +22,7 @@ import { WishWallSection } from './components/WishWallSection';
 import { PersonalizationDrawer } from './components/PersonalizationDrawer';
 import { ChapterRail } from './components/ChapterRail';
 import { Footer } from './components/Footer';
+import { LivingHeritageBackdrop } from './components/LivingHeritageBackdrop';
 
 function loadInitialConfig(): BirthdayConfig {
   try {
@@ -176,7 +177,9 @@ export default function App() {
 
   return (
     <SmoothScrollProvider>
-      <div className="min-h-screen bg-canvas text-ink">
+      <div className="relative min-h-screen text-ink">
+        <LivingHeritageBackdrop isDark={isDark} />
+
         <a
           href="#konten-utama"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-[8px] focus:bg-accent focus:px-4 focus:py-2.5 focus:text-sm focus:font-medium focus:text-accent-ink"
@@ -198,10 +201,11 @@ export default function App() {
 
         <ChapterRail />
 
-        <main id="konten-utama">
+        <main id="konten-utama" className="relative z-10">
           <HeroSection
             config={config}
             onOpenPersonalize={() => setPersonalizeOpen(true)}
+            onStartAudio={audio.startIfPaused}
           />
 
           <DedicationSection

@@ -2,14 +2,18 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'motion/react';
-import { ArrowDown, ImageIcon } from 'lucide-react';
-import type { BirthdayConfig } from '../data/birthdayConfig';
+import { ArrowDown } from 'lucide-react';
+import {
+  DEFAULT_PORTRAIT_IMAGE,
+  type BirthdayConfig,
+} from '../data/birthdayConfig';
 import { useSmoothScroll } from '../hooks/useSmoothScroll';
 import {
   calculateBirthdayStats,
   extractMonogram,
   resolveDisplayAge,
 } from '../utils/birthdayMath';
+import { EditorialPhotoFrame } from './EditorialPhotoFrame';
 import { WordReveal } from './WordReveal';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -17,25 +21,24 @@ gsap.registerPlugin(ScrollTrigger);
 interface HeroSectionProps {
   config: BirthdayConfig;
   onOpenPersonalize: () => void;
+  onStartAudio?: () => void;
 }
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
+export function HeroSection({
+  config,
+  onOpenPersonalize,
+  onStartAudio,
+}: HeroSectionProps) {
   const { scrollTo } = useSmoothScroll();
   const [now, setNow] = useState<Date>(() => new Date());
-  const [portraitFailed, setPortraitFailed] = useState(false);
   const [isUnveiled, setIsUnveiled] = useState(false);
 
   const stageRef = useRef<HTMLElement | null>(null);
   const coverRef = useRef<HTMLDivElement | null>(null);
   const revealLayerRef = useRef<HTMLDivElement | null>(null);
-  const portraitImgRef = useRef<HTMLImageElement | null>(null);
-
-  useEffect(() => {
-    setPortraitFailed(false);
-  }, [config.portraitUrl]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -64,13 +67,9 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
       });
 
       gsap.set(revealLayer, {
-        clipPath: 'inset(14% 16% 14% 16% round 10px)',
+        clipPath: 'inset(14% 16% 14% 16% round 12px)',
         opacity: 0,
       });
-
-      if (portraitImgRef.current) {
-        gsap.set(portraitImgRef.current, { scale: 1.12 });
-      }
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -90,35 +89,22 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
         cover,
         {
           clipPath: 'inset(0% 0% 100% 0%)',
-          opacity: 0.15,
+          opacity: 0.12,
           scale: 0.96,
           ease: 'power2.inOut',
           duration: 0.58,
         },
         0
-      )
-        .to(
-          revealLayer,
-          {
-            clipPath: 'inset(0% 0% 0% 0% round 0px)',
-            opacity: 1,
-            ease: 'power2.out',
-            duration: 0.78,
-          },
-          0.16
-        );
-
-      if (portraitImgRef.current) {
-        tl.to(
-          portraitImgRef.current,
-          {
-            scale: 1,
-            ease: 'none',
-            duration: 0.9,
-          },
-          0.1
-        );
-      }
+      ).to(
+        revealLayer,
+        {
+          clipPath: 'inset(0% 0% 0% 0% round 0px)',
+          opacity: 1,
+          ease: 'power2.out',
+          duration: 0.78,
+        },
+        0.16
+      );
     });
 
     mm.add('(max-width: 767px) and (prefers-reduced-motion: no-preference)', () => {
@@ -133,11 +119,11 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
           y: 0,
           duration: 0.85,
           ease: 'power3.out',
-          clearProps: 'transform,clipPath',
           scrollTrigger: {
             trigger: revealLayer,
-            start: 'top 84%',
-            once: true,
+            start: 'top 90%',
+            end: 'bottom 10%',
+            toggleActions: 'play none none reverse',
           },
         }
       );
@@ -156,10 +142,14 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
   const stats = calculateBirthdayStats(config.birthdate, now);
   const displayAge = resolveDisplayAge(config.turningAge, stats);
   const monogram = extractMonogram(config.celebrantName);
-  const coverTitleText = `Monograf Ulang Tahun, ${config.celebrantName}.`;
+  const birthStamp = config.birthplace
+    ? `${config.birthplace}, ${stats.formattedBirthdate}`
+    : stats.formattedBirthdate;
   const greetingText = `Selamat ulang tahun yang ke ${displayAge}, ${config.celebrantName}.`;
+  const isDefaultPortrait = config.portraitUrl === DEFAULT_PORTRAIT_IMAGE;
 
   const handleOpenCover = () => {
+    onStartAudio?.();
     const isDesktop = window.innerWidth >= 768;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isDesktop && !prefersReduced) {
@@ -179,46 +169,68 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
       aria-label="Sampul dan Pembuka Monograf"
       className="relative w-full md:h-[100dvh] md:overflow-hidden"
     >
-      {/* Layer 2 (Top at scrollY = 0): Serene Archival Opening Cover Curtain */}
+      {/* Layer 2 (Top at scrollY = 0): Transparent Opening Cover framing the Living Rumah Gadang World */}
       <div
         ref={coverRef}
         data-testid="opening-cover-curtain"
-        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center bg-canvas px-6 pt-16 text-center md:absolute md:inset-0 md:z-20 ${
+        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-6 pt-20 pb-12 text-center md:absolute md:inset-0 md:z-20 ${
           isUnveiled ? 'md:pointer-events-none' : 'md:pointer-events-auto'
         }`}
       >
-        <div className="mx-auto flex max-w-3xl flex-col items-center">
+        {/* Subtle radial sky-clarity wash behind typography so WCAG AA+ contrast holds over scenic layers */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--canvas) 78%, transparent) 0%, color-mix(in srgb, var(--canvas) 36%, transparent) 44%, transparent 72%)',
+          }}
+        />
+
+        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center">
           <div
             aria-hidden="true"
-            className="mb-8 flex h-16 w-16 items-center justify-center rounded-full border border-border-hairline bg-surface font-serif text-lg font-medium tracking-wider text-accent"
+            className="mb-6 flex h-15 w-15 items-center justify-center rounded-full border border-border-hairline bg-canvas/85 font-serif text-base font-medium tracking-wider text-accent backdrop-blur-[2px]"
           >
             {monogram}
           </div>
 
-          <p className="text-sm text-muted mb-4">
-            Edisi khusus, {stats.formattedBirthdate}
+          <p className="text-xs sm:text-sm font-medium tracking-[0.04em] text-muted mb-3">
+            {config.coverHeaderLine}
           </p>
 
           <WordReveal
             as="h1"
-            text={coverTitleText}
+            text={config.celebrantName}
             immediate
-            className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.08] text-[clamp(2.5rem,5.2vw,4.6rem)]"
+            className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.06] text-[clamp(2.55rem,5.6vw,4.85rem)]"
           />
 
-          <p className="mt-6 max-w-[44ch] text-sm sm:text-base leading-relaxed text-muted">
-            Lembaran kenangan, catatan perjalanan, dan doa yang disusun tenang untuk hari ulang tahunmu.
+          <p className="mt-4 text-sm sm:text-base font-medium text-accent">
+            {birthStamp}
           </p>
 
-          <button
-            type="button"
-            onClick={handleOpenCover}
-            className="group mt-14 inline-flex min-h-11 flex-col items-center gap-3 text-xs font-medium text-muted hover:text-accent transition-colors cursor-pointer"
-          >
-            <span>Gulir perlahan untuk membuka</span>
-            <span className="flex h-10 w-px bg-border-hairline group-hover:bg-accent transition-colors" />
-            <ArrowDown className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
-          </button>
+          <p className="mt-2.5 max-w-[44ch] text-sm sm:text-base leading-relaxed text-muted">
+            {config.coverSubtitle}
+          </p>
+
+          <div className="mt-10 flex flex-col items-center gap-4">
+            <motion.button
+              type="button"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.985 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+              onClick={handleOpenCover}
+              className="inline-flex min-h-12 items-center gap-2.5 rounded-[8px] bg-accent px-7 py-3 text-sm font-medium text-accent-ink hover:opacity-92 transition-opacity whitespace-nowrap cursor-pointer"
+            >
+              <span>Buka Lembaran</span>
+              <ArrowDown className="h-4 w-4" aria-hidden="true" />
+            </motion.button>
+
+            <span className="text-xs text-muted">
+              atau gulir perlahan untuk menyibak cerita
+            </span>
+          </div>
         </div>
       </div>
 
@@ -227,7 +239,7 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
         ref={revealLayerRef}
         id="pembuka-monograf"
         data-testid="hero-unveiled-spread"
-        className={`relative w-full bg-canvas md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${
+        className={`editorial-scrim relative w-full md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${
           isUnveiled ? 'md:pointer-events-auto' : 'md:pointer-events-none'
         }`}
       >
@@ -235,7 +247,7 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
             <div className="min-w-0 lg:col-span-7 flex flex-col justify-center">
               <p className="text-sm text-muted mb-4">
-                Monograf ulang tahun, {stats.formattedBirthdate}
+                Monograf ulang tahun, {birthStamp}
               </p>
 
               <h2 className="font-serif font-medium tracking-[-0.025em] text-ink leading-[1.08] text-[clamp(2.15rem,4.2vw,3.8rem)]">
@@ -303,44 +315,31 @@ export function HeroSection({ config, onOpenPersonalize }: HeroSectionProps) {
               </div>
             </div>
 
-            <figure className="min-w-0 lg:col-span-5">
-              <div className="group overflow-hidden rounded-[6px] border border-border-hairline bg-surface">
-                <div className="aspect-[3/4] max-h-[60dvh] w-full overflow-hidden bg-surface">
-                  {!portraitFailed && config.portraitUrl ? (
-                    <img
-                      ref={portraitImgRef}
-                      src={config.portraitUrl}
-                      alt={`Potret edisi ulang tahun untuk ${config.celebrantName}`}
-                      referrerPolicy="no-referrer"
-                      onError={() => setPortraitFailed(true)}
-                      className="h-full w-full object-cover will-change-transform transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center">
-                      <ImageIcon className="h-8 w-8 text-muted mb-3" aria-hidden="true" />
-                      <p className="font-serif text-lg text-ink">Bingkai Potret Arsip</p>
-                      <p className="mt-1 text-xs text-muted max-w-[26ch]">
-                        Pilih foto lokal dari perangkatmu melalui menu Ubah Data.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-                <span className="max-w-[38ch] leading-relaxed">{config.portraitCaption}</span>
-                <button
-                  type="button"
-                  onClick={onOpenPersonalize}
-                  className="text-accent underline underline-offset-4 hover:opacity-80 whitespace-nowrap shrink-0 cursor-pointer py-1"
-                >
-                  Ganti foto di Ubah Data
-                </button>
-              </figcaption>
-            </figure>
+            <div className="min-w-0 lg:col-span-5">
+              <EditorialPhotoFrame
+                src={config.portraitUrl}
+                alt={`Potret edisi ulang tahun untuk ${config.celebrantName}`}
+                subLabel={isDefaultPortrait ? 'Potret edisi 22 tahun' : config.portraitCaption}
+                aspectClass="aspect-[3/4]"
+                maxHeightClass="max-h-[58dvh]"
+                parallaxAxis="none"
+                isDefaultSlot={isDefaultPortrait}
+                defaultHint="Ganti dengan foto asli Dinda"
+                footerRight={
+                  <button
+                    type="button"
+                    onClick={onOpenPersonalize}
+                    className="text-accent underline underline-offset-4 hover:opacity-80 whitespace-nowrap shrink-0 cursor-pointer py-1"
+                  >
+                    Ganti foto di Ubah Data
+                  </button>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
 }
+

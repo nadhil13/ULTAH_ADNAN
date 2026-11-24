@@ -94,7 +94,7 @@ export function WishWallSection({
     <section
       id="ucapan"
       aria-labelledby="ucapan-heading"
-      className="scroll-mt-20 border-t border-border-hairline py-24 sm:py-32"
+      className="editorial-scrim scroll-mt-20 relative border-t border-border-hairline py-24 sm:py-32"
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="mb-14 max-w-2xl">
