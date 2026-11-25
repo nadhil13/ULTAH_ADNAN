@@ -26,9 +26,8 @@ function ChapterRow({ chapter, index }: { chapter: ChapterItem; index: number })
         whileHover={{ y: -4 }}
         whileTap={{ scale: 0.985 }}
         transition={CARD_SPRING}
-        className={`rounded-[12px] border p-7 sm:p-10 transition-colors hover:border-accent/60 ${
-          isQuoteHighlight ? 'paper-panel-tinted' : 'paper-panel'
-        }`}
+        className={`rounded-[12px] border p-7 sm:p-10 transition-colors hover:border-accent/60 ${isQuoteHighlight ? 'paper-panel-tinted' : 'paper-panel'
+          }`}
       >
         {isSplitCaption ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-12 sm:items-start">

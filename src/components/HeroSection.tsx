@@ -170,9 +170,8 @@ export function HeroSection({
       <div
         ref={coverRef}
         data-testid="opening-cover-curtain"
-        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 pt-22 pb-34 sm:px-8 sm:pb-40 text-center md:absolute md:inset-0 md:z-20 ${
-          isUnveiled ? 'md:pointer-events-none' : 'md:pointer-events-auto'
-        }`}
+        className={`relative flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 pt-22 pb-34 sm:px-8 sm:pb-40 text-center md:absolute md:inset-0 md:z-20 ${isUnveiled ? 'md:pointer-events-none' : 'md:pointer-events-auto'
+          }`}
       >
         {/* Soft upper-sky clarity scrim guaranteeing >7:1 WCAG AA+ text contrast across the cover */}
         <div
@@ -232,9 +231,8 @@ export function HeroSection({
         ref={revealLayerRef}
         id="pembuka-monograf"
         data-testid="hero-unveiled-spread"
-        className={`relative w-full md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${
-          isUnveiled ? 'md:pointer-events-auto' : 'md:pointer-events-none'
-        }`}
+        className={`relative w-full md:absolute md:inset-0 md:z-10 md:flex md:items-center md:pt-16 ${isUnveiled ? 'md:pointer-events-auto' : 'md:pointer-events-none'
+          }`}
       >
         <div className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 md:py-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-12">

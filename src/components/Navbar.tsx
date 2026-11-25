@@ -111,11 +111,10 @@ export function Navbar({
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 w-full transition-colors duration-200 ${
-        scrolled
+      className={`fixed inset-x-0 top-0 z-40 w-full transition-colors duration-200 ${scrolled
           ? 'header-glass border-b border-border-hairline'
           : 'bg-transparent border-b border-transparent'
-      }`}
+        }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
         <a

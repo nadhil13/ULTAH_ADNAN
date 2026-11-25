@@ -88,8 +88,8 @@ export function normalizeConfig(
   const obj = raw as Record<string, unknown>;
   const letterBody = Array.isArray(obj.letterBody)
     ? obj.letterBody.filter(
-        (item): item is string => typeof item === 'string' && item.trim().length > 0
-      )
+      (item): item is string => typeof item === 'string' && item.trim().length > 0
+    )
     : fallback.letterBody;
 
   const parsedYt =
@@ -143,8 +143,8 @@ export function normalizeConfig(
     portraitUrl: resolvedPortrait,
     portraitCaption:
       typeof obj.portraitCaption === 'string' &&
-      obj.portraitCaption.trim() &&
-      !obj.portraitCaption.includes('ganti dengan foto asli')
+        obj.portraitCaption.trim() &&
+        !obj.portraitCaption.includes('ganti dengan foto asli')
         ? obj.portraitCaption
         : fallback.portraitCaption,
     dedicationParagraph:

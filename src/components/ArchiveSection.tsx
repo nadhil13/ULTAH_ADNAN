@@ -346,11 +346,10 @@ export function ArchiveSection({
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => setActiveCategory(category)}
-                    className={`relative min-h-11 rounded-full px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      isActive
+                    className={`relative min-h-11 rounded-full px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${isActive
                         ? 'bg-accent text-accent-ink'
                         : 'border border-border-hairline bg-canvas text-muted hover:text-ink hover:border-ink/40'
-                    }`}
+                      }`}
                   >
                     <span>{category}</span>
                     <span className="ml-1.5 text-xs opacity-85 tabular-nums">

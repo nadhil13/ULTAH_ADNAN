@@ -19,6 +19,9 @@ const REVEAL_SPRING = {
   mass: 0.9,
 };
 
+// Set to true whenever the user requests the Ubah Isi Kupon button to be shown again.
+const SHOW_EDIT_COUPON_BUTTON = false;
+
 export function KeepsakeSurpriseCard({
   config,
   wishText,
@@ -119,14 +122,16 @@ export function KeepsakeSurpriseCard({
                 )}
               </motion.button>
 
-              <button
-                type="button"
-                onClick={onOpenPersonalize}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-[8px] border border-border-hairline bg-canvas px-3.5 py-2 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Ubah Isi Kupon</span>
-              </button>
+              {SHOW_EDIT_COUPON_BUTTON && (
+                <button
+                  type="button"
+                  onClick={onOpenPersonalize}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-[8px] border border-border-hairline bg-canvas px-3.5 py-2 text-xs font-medium text-ink hover:border-accent hover:text-accent transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Ubah Isi Kupon</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

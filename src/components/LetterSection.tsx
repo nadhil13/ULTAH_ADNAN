@@ -210,11 +210,10 @@ export function LetterSection({ config }: LetterSectionProps) {
                   {config.letterBody.map((paragraph, idx) => (
                     <p
                       key={idx}
-                      className={`whitespace-pre-line ${
-                        idx === 0
+                      className={`whitespace-pre-line ${idx === 0
                           ? 'first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-serif first-letter:text-5xl first-letter:font-medium first-letter:leading-none first-letter:text-accent'
                           : ''
-                      }`}
+                        }`}
                     >
                       {paragraph}
                     </p>

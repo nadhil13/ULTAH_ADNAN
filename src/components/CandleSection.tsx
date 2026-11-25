@@ -212,19 +212,19 @@ export function CandleSection({
                         prefersReducedMotion
                           ? { opacity: 1, scale: 1 }
                           : {
-                              opacity: [0.94, 1, 0.96, 1],
-                              scaleX: [1, 0.94, 1.04, 1],
-                              scaleY: [1, 1.06, 0.97, 1],
-                            }
+                            opacity: [0.94, 1, 0.96, 1],
+                            scaleX: [1, 0.94, 1.04, 1],
+                            scaleY: [1, 1.06, 0.97, 1],
+                          }
                       }
                       transition={
                         prefersReducedMotion
                           ? { duration: 0.2 }
                           : {
-                              duration: 2.1,
-                              repeat: Infinity,
-                              ease: 'easeInOut',
-                            }
+                            duration: 2.1,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                          }
                       }
                       style={{ transformOrigin: '140px 76px' }}
                     >
